@@ -1,5 +1,4 @@
 <?php
-// public/register.php (Logic only – no <html> tags needed)
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Grab & trim form data

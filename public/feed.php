@@ -1,5 +1,4 @@
 <?php
-// public/feed.php
 
 // 1. Identify identity but allow guests to view the 'public' tab
 $userId = $_SESSION['user_id'] ?? null;
@@ -172,7 +171,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
             if ($postDate !== $currentDateHeader):
                 $currentDateHeader = $postDate;
         ?>
-            <div class="date-divider" style="margin: 30px 0 15px; border-bottom: 2px solid #eee; padding-bottom: 5px;">
+            <div class="date-divider" style="margin: 10px 0 15px; border-bottom: 2px solid #eee; padding-bottom: 5px;">
                 <h4 style="margin: 0; color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
                     📅 <?php echo $postDate; ?>
                 </h4>

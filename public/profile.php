@@ -10,8 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 $userId = $_SESSION['user_id'];
 $msg = "";
 
-// LOGIC 5: DELETE ACCOUNT moved up here for the "headers already sent" error, must be before all the html
-// LOGIC 5: DELETE ACCOUNT (soft‑delete)
+// LOGIC 5: DELETE ACCOUNT (soft‑delete) moved up here for the "headers already sent" error, must be before all the html
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
     // We double-check the password one last time for safety
     $confirmPass = $_POST['delete_confirm_pass'] ?? '';

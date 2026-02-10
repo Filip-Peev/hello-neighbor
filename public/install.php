@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <footer style="text-align: center; margin-top: 40px; padding: 20px; color: #888; font-size: 0.85rem;">
         <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
-        <p>&copy; <?php echo date('Y'); ?> Hello Neighbor - <em>Unofficial Learning Platform App</em></p>
+        <p>&copy; <?php echo date('Y'); ?> Hello Neighbor - <em>Unofficial Learning Web App</em></p>
         <a href="mailto:filip@filip-peev.com" style="color: #007bff; text-decoration: none; font-weight: bold;">Feedback</a>
     </footer>
 
