@@ -124,7 +124,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 
 <div class="container" style="margin-bottom: 30px; background: #fff;">
     <?php if ($userId): ?>
-        <form method="POST" action="index.php?page=feed&tab=<?php echo htmlspecialchars($currentTab); ?><?php echo $selectedDate ? '&date='.urlencode($selectedDate) : ''; ?>">
+        <form method="POST" action="index.php?page=feed&tab=<?php echo htmlspecialchars($currentTab); ?><?php echo $selectedDate ? '&date=' . urlencode($selectedDate) : ''; ?>">
             <label><strong>Post to <?php echo htmlspecialchars($displayTitle); ?>:</strong></label><br>
             <textarea name="post_content" placeholder="Share something with the community..." required
                 style="width: 100%; height: 80px; padding: 10px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; font-family: sans-serif; resize: vertical;"></textarea><br>
@@ -186,7 +186,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
                         <div style="display: flex; gap: 8px; margin-top: 10px;">
                             <button onclick="toggleEdit(<?php echo $post['id']; ?>)" style="background: #ffc107; color: #000; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer;">Edit</button>
 
-                            <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?><?php echo $selectedDate ? '&date='.urlencode($selectedDate) : ''; ?>" onsubmit="return confirm('Delete this post?');">
+                            <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?><?php echo $selectedDate ? '&date=' . urlencode($selectedDate) : ''; ?>" onsubmit="return confirm('Delete this post?');">
                                 <input type="hidden" name="delete_post_id" value="<?php echo $post['id']; ?>">
                                 <input type="hidden" name="return_page" value="<?php echo $pageNumber; ?>">
                                 <button type="submit" style="background: #dc3545; color: white; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer;">Delete</button>
@@ -195,8 +195,44 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
                     <?php endif; ?>
                 </div>
 
+                <div class="comments-container">
+                    <?php
+                    // Fetch comments for this specific post
+                    $stmtComm = $db->prepare("SELECT comments.*, users.username FROM comments 
+                             JOIN users ON comments.user_id = users.id 
+                             WHERE post_id = ? ORDER BY created_at ASC");
+                    $stmtComm->execute([$post['id']]);
+                    $comments = $stmtComm->fetchAll();
+
+                    foreach ($comments as $comment): ?>
+                        <div style="font-size: 0.9rem; margin-bottom: 8px; position: relative; padding-right: 60px;">
+                            <strong><?php echo htmlspecialchars($comment['username']); ?>:</strong>
+                            <?php echo htmlspecialchars($comment['content']); ?>
+                            <small style="color: #999; display: block;"><?php echo date('M j, g:i a', strtotime($comment['created_at'])); ?></small>
+
+                            <?php if ($userId && ($comment['user_id'] == $userId || $userRole === 'admin')): ?>
+                                <form method="POST" action="delete_comment.php" onsubmit="return confirm('Delete this comment?');" style="position: absolute; right: 0; top: 0;">
+                                    <input type="hidden" name="comment_id" value="<?php echo $comment['id']; ?>">
+                                    <input type="hidden" name="return_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
+                                    <button type="submit" class="btn-remove-comment">Remove</button>
+                                </form>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+
+                    <?php if ($userId): ?>
+                        <form method="POST" action="add_comment.php" style="margin-top: 10px;">
+                            <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+                            <input type="hidden" name="return_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
+                            <input type="text" name="comment_content" placeholder="Write an answer..." required
+                                style="width: 80%; padding: 5px; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                            <button type="submit" style="padding: 4px 10px; font-size: 0.8rem;">Reply</button>
+                        </form>
+                    <?php endif; ?>
+                </div>
+
                 <div id="edit-mode-<?php echo $post['id']; ?>" style="display: none;">
-                    <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?><?php echo $selectedDate ? '&date='.urlencode($selectedDate) : ''; ?>">
+                    <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?><?php echo $selectedDate ? '&date=' . urlencode($selectedDate) : ''; ?>">
                         <input type="hidden" name="update_post_id" value="<?php echo $post['id']; ?>">
                         <input type="hidden" name="return_page" value="<?php echo $pageNumber; ?>">
                         <textarea name="edit_content" style="width: 100%; height: 70px; padding: 8px; margin-bottom: 8px; border: 1px solid #ccc; font-family: sans-serif;"><?php echo htmlspecialchars($post['content']); ?></textarea><br>
