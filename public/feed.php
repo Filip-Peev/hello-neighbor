@@ -7,8 +7,13 @@ $userRole = $_SESSION['role'] ?? 'guest';
 // Capture the current tab (defaults to public)
 $currentTab = $_GET['tab'] ?? 'public';
 
-// Capture the filter date if provided
-$selectedDate = $_GET['date'] ?? null;
+// Capture the filter date or default to today
+$selectedDate = $_GET['date'] ?? date('Y-m-d');
+
+// Calculate previous and next days
+$dateObj = new DateTime($selectedDate);
+$prevDay = (clone $dateObj)->modify('-1 day')->format('Y-m-d');
+$nextDay = (clone $dateObj)->modify('+1 day')->format('Y-m-d');
 
 // Pagination logic
 $pageNumber = isset($_GET['p']) ? (int)$_GET['p'] : 1;
@@ -58,8 +63,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // C. Handle New Post Submission
     if (isset($_POST['post_content'])) {
-        $content = trim($_POST['post_content']);
+        // Double-check that we are actually on "Today" before saving
+        if ($selectedDate !== date('Y-m-d')) {
+            die("Error: You can only post notices to the current date.");
+        }
 
+        $content = trim($_POST['post_content']);
         $allowed = ['public', 'private', 'other'];
         $categoryToSave = in_array($currentTab, $allowed) ? $currentTab : 'public';
 
@@ -67,7 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $db->prepare("INSERT INTO posts (user_id, content, category) VALUES (?, ?, ?)");
             $stmt->execute([$userId, $content, $categoryToSave]);
         }
-        header("Location: index.php?page=feed&tab=$categoryToSave&p=1&msg=posted");
+
+        header("Location: index.php?page=feed&tab=$categoryToSave&p=1&date=" . date('Y-m-d') . "&msg=posted");
         exit;
     }
 }
@@ -124,12 +134,20 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 
 <div class="container" style="margin-bottom: 30px; background: #fff;">
     <?php if ($userId): ?>
-        <form method="POST" action="index.php?page=feed&tab=<?php echo htmlspecialchars($currentTab); ?><?php echo $selectedDate ? '&date=' . urlencode($selectedDate) : ''; ?>">
-            <label><strong>Post to <?php echo htmlspecialchars($displayTitle); ?>:</strong></label><br>
-            <textarea name="post_content" placeholder="Share something with the community..." required
-                style="width: 100%; height: 80px; padding: 10px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; font-family: sans-serif; resize: vertical;"></textarea><br>
-            <button type="submit" style="margin-top: 10px;"><?php echo $lang['btn_post']; ?></button>
-        </form>
+        <?php if ($selectedDate === date('Y-m-d')): ?>
+            <form method="POST" action="index.php?page=feed&tab=<?php echo htmlspecialchars($currentTab); ?>&date=<?php echo urlencode($selectedDate); ?>">
+                <label><strong>Post to <?php echo htmlspecialchars($displayTitle); ?>:</strong></label><br>
+                <textarea name="post_content" placeholder="Share something with the community..." required
+                    style="width: 100%; height: 80px; padding: 10px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; font-family: sans-serif; resize: vertical;"></textarea><br>
+                <button type="submit" style="margin-top: 10px; cursor: pointer;"><?php echo $lang['btn_post']; ?></button>
+            </form>
+        <?php else: ?>
+            <div style="text-align: center; padding: 20px; border: 1px dashed #ccc; border-radius: 8px; color: #666;">
+                <p>💡 You are viewing an archived date. <br>
+                    <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>&date=<?php echo date('Y-m-d'); ?>" style="color: var(--primary); font-weight: bold; text-decoration: none;">Go to Today</a> to post a new notice.
+                </p>
+            </div>
+        <?php endif; ?>
     <?php else: ?>
         <p style="text-align: center; color: #666;">
             <strong>Want to post here?</strong> <br>
@@ -138,21 +156,39 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
     <?php endif; ?>
 </div>
 
-<div class="filter-container" style="margin-bottom: 20px; padding: 15px; background: #f4f4f4; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+<div class="filter-container" style="margin-bottom: 20px; padding: 15px; background: #f4f4f4; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+
+    <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>&date=<?php echo $prevDay; ?>"
+        style="text-decoration: none; background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; color: var(--text-main); font-weight: bold;">
+        &larr;
+    </a>
+
     <form id="dateFilterForm" method="GET" action="index.php" style="display: flex; align-items: center; gap: 10px; margin: 0;">
         <input type="hidden" name="page" value="feed">
         <input type="hidden" name="tab" value="<?php echo htmlspecialchars($currentTab); ?>">
 
-        <label for="filter_date"><strong>Jump to Date:</strong></label>
-        <input type="date" id="filter_date" name="date"
-            value="<?php echo htmlspecialchars($selectedDate ?? ''); ?>"
+        <input type="date"
+            id="filter_date"
+            name="date"
+            class="date-filter-input"
+            value="<?php echo htmlspecialchars($selectedDate); ?>"
+            onclick="this.showPicker();"
             onchange="document.getElementById('dateFilterForm').submit();"
-            style="padding: 5px; border-radius: 4px; border: 1px solid #ccc; width: auto; margin-bottom: 0; cursor: pointer;">
-
-        <?php if ($selectedDate): ?>
-            <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>" style="font-size: 0.8rem; color: #dc3545; text-decoration: none; font-weight: bold;">✕ Clear Filter</a>
-        <?php endif; ?>
+            onkeydown="return false;"
+            style="padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; width: auto; cursor: pointer; background-color: #fff; text-align: center;">
     </form>
+
+    <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>&date=<?php echo $nextDay; ?>"
+        style="text-decoration: none; background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; color: var(--text-main); font-weight: bold;">
+        &rarr;
+    </a>
+
+    <?php if ($selectedDate !== date('Y-m-d')): ?>
+        <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>&date=<?php echo date('Y-m-d'); ?>"
+            style="font-size: 0.8rem; color: var(--danger); text-decoration: none; font-weight: bold; margin-left: 10px; padding: 5px 10px; border: 1px solid var(--danger); border-radius: 6px;">
+            Today
+        </a>
+    <?php endif; ?>
 </div>
 
 <div class="feed-container">

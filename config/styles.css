@@ -245,3 +245,43 @@ textarea {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Stronger outer shadow when active */
     border-left-color: #059669;  /* Darker emerald green border */
 }
+
+.date-filter-input {
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    outline: none;
+    margin-bottom: 0px;
+}
+
+.date-filter-input:hover {
+    border-color: var(--primary) !important;
+}
+
+/* Optional: Targets the calendar icon specifically in some browsers */
+.date-filter-input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.filter-container a:hover {
+    border-color: var(--primary) !important;
+    color: var(--primary) !important;
+    background-color: #f8fafc;
+}
+
+.date-filter-input {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.add-post-container textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.date-filter-input:focus {
+    border-color: var(--primary);
+    outline: none;
+}
