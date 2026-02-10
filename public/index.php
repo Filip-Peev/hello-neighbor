@@ -1,6 +1,18 @@
 <?php
 session_start();
 
+$supported_langs = ['en', 'bg'];
+
+$lang_code = $_GET['lang'] ?? $_SESSION['lang'] ?? 'en';
+
+if (!in_array($lang_code, $supported_langs)) {
+    $lang_code = 'en';
+}
+
+// 3. Save to session and load the file
+$_SESSION['lang'] = $lang_code;
+$lang = include "../config/languages/{$lang_code}.php";
+
 if (!file_exists(__DIR__ . '/../.env')) {
     header("Location: install.php");
     exit;
@@ -37,20 +49,25 @@ $tab = $_GET['tab'] ?? 'public';
                 <span style="font-size: 1.2rem; letter-spacing: 0.5px;">Hello Neighbor</span>
             </a>
 
-            <a href="index.php?page=feed&tab=public" style="<?php echo ($page === 'feed' && $tab === 'public') ? 'text-decoration: underline;' : ''; ?>">Public</a>
+            <a href="index.php?page=feed&tab=public" style="<?php echo ($page === 'feed' && $tab === 'public') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_public']; ?></a>
 
             <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="index.php?page=feed&tab=private" style="<?php echo ($page === 'feed' && $tab === 'private') ? 'text-decoration: underline;' : ''; ?>">Private</a>
+                <a href="index.php?page=feed&tab=private" style="<?php echo ($page === 'feed' && $tab === 'private') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_private']; ?></a>
                 <a href="index.php?page=feed&tab=other" style="<?php echo ($page === 'feed' && $tab === 'other') ? 'text-decoration: underline;' : ''; ?>">Other</a>
             <?php endif; ?>
         </div>
 
+        <div class="lang-switcher" style="margin-left: 20px; font-weight: bold;">
+            <a href="?lang=en" style="color: <?php echo $lang_code === 'en' ? 'var(--primary)' : '#aaa'; ?>;">EN</a> |
+            <a href="?lang=bg" style="color: <?php echo $lang_code === 'bg' ? 'var(--primary)' : '#aaa'; ?>;">BG</a>
+        </div>
+
         <div class="nav-right">
             <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="index.php?page=profile" style="<?php echo $page === 'profile' ? 'text-decoration: underline;' : ''; ?>">Profile</a>
+                <a href="index.php?page=profile" style="<?php echo $page === 'profile' ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_profile']; ?></a>
 
                 <span style="color: #aaa;">| Welcome, <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong></span>
-                <a href="logout.php" style="color: #ff6666;">Logout</a>
+                <a href="logout.php" style="color: #ff6666;"><?php echo $lang['nav_logout']; ?></a>
             <?php else: ?>
                 <a href="index.php?page=register" style="<?php echo $page === 'register' ? 'text-decoration: underline;' : ''; ?>">Register</a>
                 <a href="index.php?page=login" style="<?php echo $page === 'login' ? 'text-decoration: underline;' : ''; ?>">Login</a>

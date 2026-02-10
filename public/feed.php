@@ -128,7 +128,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
             <label><strong>Post to <?php echo htmlspecialchars($displayTitle); ?>:</strong></label><br>
             <textarea name="post_content" placeholder="Share something with the community..." required
                 style="width: 100%; height: 80px; padding: 10px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; font-family: sans-serif; resize: vertical;"></textarea><br>
-            <button type="submit" style="margin-top: 10px;">Post Announcement</button>
+            <button type="submit" style="margin-top: 10px;"><?php echo $lang['btn_post']; ?></button>
         </form>
     <?php else: ?>
         <p style="text-align: center; color: #666;">
@@ -214,7 +214,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
                                 <form method="POST" action="delete_comment.php" onsubmit="return confirm('Delete this comment?');" style="position: absolute; right: 0; top: 0;">
                                     <input type="hidden" name="comment_id" value="<?php echo $comment['id']; ?>">
                                     <input type="hidden" name="return_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
-                                    <button type="submit" class="btn-remove-comment">Remove</button>
+                                    <button type="submit" class="btn-remove-comment"><?php echo $lang['btn_remove']; ?></button>
                                 </form>
                             <?php endif; ?>
                         </div>
@@ -226,7 +226,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
                             <input type="hidden" name="return_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
                             <input type="text" name="comment_content" placeholder="Write an answer..." required
                                 style="width: 80%; padding: 5px; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
-                            <button type="submit" style="padding: 4px 10px; font-size: 0.8rem;">Reply</button>
+                            <button type="submit" style="padding: 4px 10px; font-size: 0.8rem;"><?php echo $lang['btn_reply']; ?></button>
                         </form>
                     <?php endif; ?>
                 </div>
