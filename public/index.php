@@ -37,22 +37,23 @@ $tab = $_GET['tab'] ?? 'public';
                 <span style="font-size: 1.2rem; letter-spacing: 0.5px;">Hello Neighbor</span>
             </a>
 
-            <a href="index.php?page=feed&tab=public" style="<?php echo $tab === 'public' ? 'text-decoration: underline;' : ''; ?>">Public</a>
+            <a href="index.php?page=feed&tab=public" style="<?php echo ($page === 'feed' && $tab === 'public') ? 'text-decoration: underline;' : ''; ?>">Public</a>
 
             <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="index.php?page=feed&tab=private" style="<?php echo $tab === 'private' ? 'text-decoration: underline;' : ''; ?>">Private</a>
-                <a href="index.php?page=feed&tab=other" style="<?php echo $tab === 'other' ? 'text-decoration: underline;' : ''; ?>">Other</a>
+                <a href="index.php?page=feed&tab=private" style="<?php echo ($page === 'feed' && $tab === 'private') ? 'text-decoration: underline;' : ''; ?>">Private</a>
+                <a href="index.php?page=feed&tab=other" style="<?php echo ($page === 'feed' && $tab === 'other') ? 'text-decoration: underline;' : ''; ?>">Other</a>
             <?php endif; ?>
         </div>
 
         <div class="nav-right">
             <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="index.php?page=profile">Profile</a>
+                <a href="index.php?page=profile" style="<?php echo $page === 'profile' ? 'text-decoration: underline;' : ''; ?>">Profile</a>
+
                 <span style="color: #aaa;">| Welcome, <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong></span>
                 <a href="logout.php" style="color: #ff6666;">Logout</a>
             <?php else: ?>
-                <a href="index.php?page=register">Register</a>
-                <a href="index.php?page=login">Login</a>
+                <a href="index.php?page=register" style="<?php echo $page === 'register' ? 'text-decoration: underline;' : ''; ?>">Register</a>
+                <a href="index.php?page=login" style="<?php echo $page === 'login' ? 'text-decoration: underline;' : ''; ?>">Login</a>
             <?php endif; ?>
         </div>
     </nav>
