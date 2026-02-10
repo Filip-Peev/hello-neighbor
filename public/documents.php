@@ -23,9 +23,9 @@ if ($userRole === 'admin'): ?>
 
             <div style="margin-bottom: 10px;">
                 <label style="display:block; font-weight:bold;">Description (Optional):</label>
-                <textarea name="description" placeholder="Short summary of the document..." style="width:100%; padding:10px; border-radius:4px; border:1px solid #ccc;"></textarea>
+                <textarea name="description" placeholder="Short summary of the document..." class="summary-textarea"></textarea>
             </div>
-            
+
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px;">Select File (PDF, JPG, PNG):</label>
                 <input type="file" name="doc_file" accept=".pdf,.jpg,.jpeg,.png" required>
@@ -40,17 +40,17 @@ if ($userRole === 'admin'): ?>
                     <option value="general" selected>📄 General Info</option>
                 </select>
             </div>
-            
-            <button type="submit" style="background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-weight: bold;">Upload to Library</button>
+
+            <button type="submit">Upload to Library</button>
         </form>
     </div>
 <?php endif;
 
 // --- 2. DISPLAY DOCUMENTS BY CATEGORY ---
 $categories = [
-    'legal' => '⚖️ Legal & Contracts', 
-    'maintenance' => '🛠️ Maintenance & Technical', 
-    'financial' => '💰 Financial Reports', 
+    'legal' => '⚖️ Legal & Contracts',
+    'maintenance' => '🛠️ Maintenance & Technical',
+    'financial' => '💰 Financial Reports',
     'general' => '📄 General Info'
 ];
 
@@ -62,14 +62,14 @@ foreach ($categories as $key => $label) {
     if ($docs) {
         echo "<h3 style='border-bottom: 2px solid #eee; padding-bottom: 8px; margin-top: 40px; color: #444;'>$label</h3>";
         echo "<div style='display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 15px;'>";
-        
+
         foreach ($docs as $doc) {
             // Safe pathinfo check to prevent NULL warnings in PHP 8.1+
             $ext = !empty($doc['file_path']) ? strtolower(pathinfo($doc['file_path'], PATHINFO_EXTENSION)) : '';
             $icon = ($ext === 'pdf') ? '📕' : '🖼️';
-            
+
             echo "<div class='card' style='padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px; position: relative; background: #fff;'>";
-            
+
             // Delete Button for Admins
             if ($userRole === 'admin') {
                 echo "<form method='POST' action='delete_document.php' style='position:absolute; right:10px; top:10px;'>
@@ -81,12 +81,12 @@ foreach ($categories as $key => $label) {
             echo "<div style='font-size: 2rem; margin-bottom: 10px;'>$icon</div>";
             echo "<h4 style='margin: 0 0 8px 0; color: #007bff;'>" . htmlspecialchars($doc['title']) . "</h4>";
             echo "<p style='font-size: 0.85rem; color: #666; margin-bottom: 15px; min-height: 40px;'>" . htmlspecialchars($doc['description'] ?? '') . "</p>";
-            
+
             if (!empty($doc['file_path'])) {
                 $filePath = "../uploads/" . htmlspecialchars($doc['file_path']);
                 echo "<a href='$filePath' target='_blank' style='display: block; text-align: center; background: #f0f7ff; padding: 10px; border-radius: 6px; color: #007bff; font-weight: bold; text-decoration: none; border: 1px solid #cce5ff;'>View / Download</a>";
             }
-            
+
             echo "<div style='font-size: 0.7rem; color: #999; margin-top: 10px; text-align: right;'>Added: " . date('d M Y', strtotime($doc['created_at'])) . "</div>";
             echo "</div>";
         }

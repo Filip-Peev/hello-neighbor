@@ -208,13 +208,13 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
     <?php if (empty($posts)): ?>
         <div style="text-align: center; padding: 40px 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px; color: #666;">
             <p style="font-size: 1.1rem; margin-bottom: 10px;">📭 No notices found in <strong><?php echo htmlspecialchars($displayTitle); ?></strong> for this date.</p>
-            
+
             <?php if ($latestDateWithPosts): ?>
-                <p>Would you like to see the latest activity from 
-                   <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>&date=<?php echo $latestDateWithPosts; ?>" 
-                      style="color: #28a745; font-weight: bold; text-decoration: underline;">
-                      <?php echo date('F j, Y', strtotime($latestDateWithPosts)); ?>
-                   </a>?
+                <p>Would you like to see the latest activity from
+                    <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>&date=<?php echo $latestDateWithPosts; ?>"
+                        style="color: #28a745; font-weight: bold; text-decoration: underline;">
+                        <?php echo date('F j, Y', strtotime($latestDateWithPosts)); ?>
+                    </a>?
                 </p>
             <?php else: ?>
                 <p>There are no posts in this section yet.</p>
@@ -246,12 +246,14 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 
                     <?php if ($userId && ($post['user_id'] == $userId || $userRole === 'admin')): ?>
                         <div style="display: flex; gap: 8px; margin-top: 10px;">
-                            <button onclick="toggleEdit(<?php echo $post['id']; ?>)" style="background: #ffc107; color: #000; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer;">Edit</button>
+                            <button onclick="toggleEdit(<?php echo $post['id']; ?>)" class="edit-button">
+                                Edit
+                            </button>
 
                             <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?><?php echo $selectedDate ? '&date=' . urlencode($selectedDate) : ''; ?>" onsubmit="return confirm('Delete this post?');">
                                 <input type="hidden" name="delete_post_id" value="<?php echo $post['id']; ?>">
                                 <input type="hidden" name="return_page" value="<?php echo $pageNumber; ?>">
-                                <button type="submit" style="background: #dc3545; color: white; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer;">Delete</button>
+                                <button type="submit" class="delete-button">Delete</button>
                             </form>
                         </div>
                     <?php endif; ?>

@@ -3,7 +3,9 @@
     --primary: #2563eb;
     --primary-hover: #1d4ed8;
     --success: #059669;
+    --success-hover: #047857;
     --danger: #dc2626;
+    --danger-hover: #b91c1c;
     --warning: #f59e0b;
     --bg-body: #f8fafc;
     --bg-card: #ffffff;
@@ -107,7 +109,7 @@ textarea:focus {
 button {
     padding: 10px 24px;
     cursor: pointer;
-    background: var(--primary);
+    background: var(--success);
     color: white;
     border: none;
     border-radius: 8px;
@@ -117,7 +119,7 @@ button {
 }
 
 button:hover {
-    background: var(--primary-hover);
+    background: var(--success-hover);
 }
 
 button:active {
@@ -125,13 +127,17 @@ button:active {
 }
 
 .btn-remove-comment {
-    background: #dc3545;
+    background: var(--danger);
     color: white;
     padding: 5px 10px;
     font-size: 0.75rem;
     border-radius: 4px;
     border: none;
     cursor: pointer;
+}
+
+.btn-remove-comment:hover {
+    background: var(--danger-hover);
 }
 
 .btn-comment-reply {
@@ -142,7 +148,7 @@ button:active {
 }
 
 .btn-comment-reply:hover {
-    background: #ffffffb3;
+    background: var(--success-hover);
 }
 
 /* --- The Feed Components --- */
@@ -358,4 +364,103 @@ button:active {
     background: var(--bg-body);
     padding: 12px;
     border-radius: 6px;
+}
+
+/* User Skills Area */
+
+.card {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.card-title {
+    margin-top: 0;
+}
+
+.card-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.summary-textarea {
+    width: 100%;
+    height: 90px;
+    padding: 10px;
+    margin-bottom: 15px;
+
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.4;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.summary-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.primary-button {
+    background: var(--success);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.primary-button:hover {
+    background: var(--success-hover);
+}
+
+.delete-button {
+    background: var(--danger);
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background: var(--danger-hover);
+}
+
+.delete-account-button {
+    margin-top: 10px;
+    background: var(--danger);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-account-button:hover {
+    background: var(--danger-hover);
+}
+
+.edit-button {
+    background: #ffc107;
+    color: #000;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.edit-button:hover {
+    background: #e0a800;
 }

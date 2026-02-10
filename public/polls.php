@@ -30,7 +30,7 @@ if ($userRole === 'admin'): ?>
 
             <button type="button" onclick="addOption()" style="background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-bottom: 15px;">+ Add Another Option</button>
             <br>
-            <button type="submit" style="background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">Publish Poll</button>
+            <button type="submit">Publish Poll</button>
         </form>
     </div>
     <script>

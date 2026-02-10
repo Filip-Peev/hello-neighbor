@@ -28,7 +28,7 @@ return [
     'msg_deleted'      => 'Notice removed.',
     
     // Actions
-    'btn_remove'       => 'remove',
+    'btn_remove'       => 'Remove',
     'btn_delete'       => 'Delete',
     'btn_edit'         => 'Edit',
     'btn_save'         => 'Save',

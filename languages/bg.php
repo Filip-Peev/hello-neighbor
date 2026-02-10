@@ -28,7 +28,7 @@ return [
     'msg_deleted'      => 'Съобщението е премахнато.',
     
     // Actions
-    'btn_remove'       => 'премахни',
+    'btn_remove'       => 'Премахни',
     'btn_delete'       => 'Изтрий',
     'btn_edit'         => 'Редактирай',
     'btn_save'         => 'Запази',
