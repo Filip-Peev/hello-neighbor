@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// 1. Check if the app is installed. If not, redirect to install.php
 if (!file_exists(__DIR__ . '/../.env')) {
     header("Location: install.php");
     exit;
@@ -15,32 +14,27 @@ try {
     die("Application Error: " . $e->getMessage());
 }
 
-$page = $_GET['page'] ?? 'home';
+// Set 'feed' as the default page instead of 'home'
+$page = $_GET['page'] ?? 'feed';
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <title>Hello Neighbor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../config/styles.css">
 </head>
-
 <body>
 
     <nav>
         <div class="nav-left">
-            <a href="index.php?page=home">Home</a>
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="index.php?page=dashboard">Dashboard</a>
-                <a href="index.php?page=feed">Notice Board</a>
-                <a href="index.php?page=profile">Profile</a>
-            <?php endif; ?>
+            <a href="index.php?page=feed">Notice Board</a>
         </div>
 
         <div class="nav-right">
             <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="index.php?page=profile">Profile</a>
                 <span style="color: #aaa;">| Welcome, <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong></span>
                 <a href="logout.php" style="color: #ff6666;">Logout</a>
             <?php else: ?>
@@ -63,28 +57,11 @@ $page = $_GET['page'] ?? 'home';
                 include 'profile.php';
                 break;
             case 'feed':
-                include 'feed.php';
-                break;
-            case 'dashboard':
-                if (!isset($_SESSION['user_id'])) {
-                    echo "<h2>🚫 Access Denied</h2><p>You must <a href='index.php?page=login'>Login</a> to see this page.</p>";
-                } else {
-                    echo "<h2>Member Dashboard</h2>";
-                    echo "<p>Secret Info: The server time is " . date('H:i:s') . "</p>";
-                    echo "<p>This content is only visible to logged-in users!</p>";
-                }
-                break;
             default:
-                echo "<h2>Welcome to the Home Page</h2>";
-                if (isset($_GET['msg']) && $_GET['msg'] == 'deleted') {
-                    echo "<p style='color: orange;'>Account deleted successfully.</p>";
-                }
-                echo "<p>The database is connected and ready for action.</p>";
+                include 'feed.php';
                 break;
         }
         ?>
     </div>
-
 </body>
-
 </html>

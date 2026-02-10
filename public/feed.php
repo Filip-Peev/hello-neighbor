@@ -1,23 +1,19 @@
 <?php
 // public/feed.php
 
-// 1. Security check: Ensure user is logged in
-if (!isset($_SESSION['user_id'])) {
-    echo "<h3>Access Denied</h3><p>Please log in to participate in the notice board.</p>";
-    return;
-}
+// Define user identity but don't block access if null
+$userId = $_SESSION['user_id'] ?? null;
+$userRole = $_SESSION['role'] ?? 'guest';
 
-$userId = $_SESSION['user_id'];
-$userRole = $_SESSION['role'] ?? 'user';
-
-// Capture the current page from the URL for persistent navigation
 $pageNumber = isset($_GET['p']) ? (int)$_GET['p'] : 1;
 if ($pageNumber < 1) $pageNumber = 1;
 
-// --- LOGIC SECTION: Handles actions then redirects to the specific page ---
+// --- LOGIC SECTION: Permission check added for all actions ---
 
 // 2. Handle Delete Request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_post_id'])) {
+    if (!$userId) die("Unauthorized"); // Extra safety
+    
     $postId = $_POST['delete_post_id'];
     $returnPage = isset($_POST['return_page']) ? (int)$_POST['return_page'] : 1;
 
@@ -29,20 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_post_id'])) {
         $stmt->execute([$postId, $userId]);
     }
 
-    // Logic to check if we just deleted the last item on a page
-    $totalRemaining = $db->query("SELECT COUNT(*) FROM posts")->fetchColumn();
-    $postsPerPage = 10;
-    $maxPagesPossible = ceil($totalRemaining / $postsPerPage);
-    if ($returnPage > $maxPagesPossible && $maxPagesPossible > 0) {
-        $returnPage = $maxPagesPossible;
-    }
-
     header("Location: index.php?page=feed&p=$returnPage&msg=deleted");
     exit;
 }
 
 // 3. Handle Edit/Update Request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_post_id'])) {
+    if (!$userId) die("Unauthorized");
+
     $postId = $_POST['update_post_id'];
     $newContent = trim($_POST['edit_content']);
     $returnPage = isset($_POST['return_page']) ? (int)$_POST['return_page'] : 1;
@@ -60,8 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_post_id'])) {
     exit;
 }
 
-// 4. Handle New Post Submission (Always goes to page 1 as it's the newest)
+// 4. Handle New Post Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['post_content'])) {
+    if (!$userId) die("Unauthorized");
+
     $content = trim($_POST['post_content']);
     if (!empty($content)) {
         $stmt = $db->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
@@ -71,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['post_content'])) {
     exit;
 }
 
-// --- DATA FETCHING ---
+// --- DATA FETCHING (Publicly Accessible) ---
 
 $postsPerPage = 10;
 $offset = ($pageNumber - 1) * $postsPerPage;
@@ -100,17 +92,23 @@ $posts = $db->query($query)->fetchAll();
 <?php endif; ?>
 
 <div class="container" style="margin-bottom: 30px; background: #fff;">
-    <form method="POST" action="index.php?page=feed">
-        <label><strong>Post a new notice:</strong></label><br>
-        <textarea name="post_content" placeholder="What's happening in the building?" required 
-                  style="width: 100%; height: 80px; padding: 10px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; font-family: sans-serif; resize: vertical;"></textarea><br>
-        <button type="submit" style="margin-top: 10px;">Post Announcement</button>
-    </form>
+    <?php if ($userId): ?>
+        <form method="POST" action="index.php?page=feed">
+            <label><strong>Post a new notice:</strong></label><br>
+            <textarea name="post_content" placeholder="What's happening in the building?" required 
+                      style="width: 100%; height: 80px; padding: 10px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; font-family: sans-serif; resize: vertical;"></textarea><br>
+            <button type="submit" style="margin-top: 10px;">Post Announcement</button>
+        </form>
+    <?php else: ?>
+        <p style="text-align: center; color: #666;">
+            Please <a href="index.php?page=login">Login</a> or <a href="index.php?page=register">Register</a> to post on the board.
+        </p>
+    <?php endif; ?>
 </div>
 
 <div class="feed-container">
     <?php if (empty($posts)): ?>
-        <p>No notices found on this page.</p>
+        <p>No notices found.</p>
     <?php else: ?>
         <?php foreach ($posts as $post): ?>
             <div id="post-<?php echo $post['id']; ?>" style="background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; border-left: 5px solid <?php echo ($post['author_role'] === 'admin') ? '#007bff' : '#28a745'; ?>; position: relative;">
@@ -126,7 +124,7 @@ $posts = $db->query($query)->fetchAll();
                 <div id="view-mode-<?php echo $post['id']; ?>">
                     <p style="color: #444; line-height: 1.4; margin: 10px 0;"><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
                     
-                    <?php if ($post['user_id'] == $userId || $userRole === 'admin'): ?>
+                    <?php if ($userId && ($post['user_id'] == $userId || $userRole === 'admin')): ?>
                         <div style="display: flex; gap: 8px; margin-top: 10px;">
                             <button onclick="toggleEdit(<?php echo $post['id']; ?>)" style="background: #ffc107; color: #000; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer;">Edit</button>
                             
@@ -171,13 +169,7 @@ $posts = $db->query($query)->fetchAll();
 function toggleEdit(postId) {
     const viewDiv = document.getElementById('view-mode-' + postId);
     const editDiv = document.getElementById('edit-mode-' + postId);
-    
-    if (viewDiv.style.display === 'none') {
-        viewDiv.style.display = 'block';
-        editDiv.style.display = 'none';
-    } else {
-        viewDiv.style.display = 'none';
-        editDiv.style.display = 'block';
-    }
+    viewDiv.style.display = viewDiv.style.display === 'none' ? 'block' : 'none';
+    editDiv.style.display = editDiv.style.display === 'none' ? 'block' : 'none';
 }
 </script>
