@@ -143,11 +143,11 @@ $userData = $stmt->fetch();
         Tell your neighbors what you do or how you can help (e.g., "Professional Plumber", "Available for pet sitting", "I have a ladder you can borrow").
     </p>
 
-    <form method="POST" action="index.php?page=profile">
-        <textarea
-            name="summary"
-            class="summary-textarea" maxlength="500" minlength="2"
-            placeholder="Write a short summary of your skills or how you can help..."><?php echo htmlspecialchars($userData['summary'] ?? ''); ?></textarea>
+    <form method="POST" action="index.php?page=profile"><textarea name="summary" id="postContent" class="summary-textarea" maxlength="500" minlength="2" placeholder="Write a short summary of your skills or how you can help..."><?php echo htmlspecialchars($userData['summary'] ?? ''); ?></textarea>
+
+        <div style="text-align: right; font-size: 0.75rem; color: #888; margin-top: 0px;">
+            <span id="charCount">0</span>/500
+        </div>
 
         <button type="submit" name="update_summary" class="primary-button">
             Save Summary

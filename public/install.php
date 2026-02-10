@@ -2,7 +2,7 @@
 $envPath = __DIR__ . '/../.env';
 
 if (file_exists($envPath)) {
-    die("Installation already completed. Delete install.php for security.");
+    die("Installation already completed. Delete install.php.locked for security.");
 }
 
 $message = "";
@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     email VARCHAR(100) NOT NULL UNIQUE,
                     password_hash VARCHAR(255) NOT NULL,
                     role ENUM('user', 'admin') DEFAULT 'user',
+                    summary TEXT NULL,
                     is_deleted TINYINT(1) DEFAULT 0,
                     last_login DATETIME DEFAULT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

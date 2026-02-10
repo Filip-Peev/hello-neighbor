@@ -150,8 +150,11 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
         <?php if ($selectedDate === date('Y-m-d')): ?>
             <form method="POST" action="index.php?page=feed&tab=<?php echo htmlspecialchars($currentTab); ?>&date=<?php echo urlencode($selectedDate); ?>">
                 <label><strong>Post to <?php echo htmlspecialchars($displayTitle); ?>:</strong></label><br>
-                <textarea name="post_content" maxlength="500" minlength="2" placeholder="Share something with the community..." required
+                <textarea name="post_content" id="postContent" maxlength="500" minlength="2" placeholder="Share something with the community..." required
                     style="width: 100%; height: 80px; padding: 10px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; font-family: sans-serif; resize: vertical;"></textarea><br>
+                <div style="text-align: right; font-size: 0.75rem; color: #888; margin-top: 0px;">
+                    <span id="charCount">0</span>/500
+                </div>
                 <button type="submit" style="margin-top: 10px; cursor: pointer;"><?php echo $lang['btn_post']; ?></button>
             </form>
         <?php else: ?>

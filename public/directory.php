@@ -40,8 +40,7 @@ $neighbors = $stmt->fetchAll();
                 type="text"
                 name="search"
                 placeholder="Search skills or names..."
-                value="<?php echo htmlspecialchars($searchTerm); ?>"
-            >
+                value="<?php echo htmlspecialchars($searchTerm); ?>">
 
             <?php if (!empty($searchTerm)): ?>
                 <a href="index.php?page=directory" title="Clear search" class="clear-search">Clear</a>
@@ -63,9 +62,6 @@ $neighbors = $stmt->fetchAll();
         <?php foreach ($neighbors as $neighbor): ?>
             <div class="neighbor-card">
                 <div class="neighbor-header">
-                    <div class="neighbor-avatar">
-                        <?php echo strtoupper(substr($neighbor['username'], 0, 1)); ?>
-                    </div>
 
                     <div>
                         <strong class="neighbor-name">
@@ -84,7 +80,6 @@ $neighbors = $stmt->fetchAll();
                 <div class="neighbor-summary-box">
                     <?php if (!empty($neighbor['summary'])): ?>
                         <p class="neighbor-summary">
-                            <strong>Specialty:</strong><br>
                             <?php echo htmlspecialchars($neighbor['summary']); ?>
                         </p>
                     <?php else: ?>

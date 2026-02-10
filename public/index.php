@@ -71,21 +71,14 @@ function showAccessDenied($title, $reason)
                 </a>
 
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="index.php?page=directory" style="<?php echo ($page === 'directory') ? 'text-decoration: underline;' : ''; ?>">
-                        Directory
-                    </a>
+                    <a href="index.php?page=directory" style="<?php echo ($page === 'directory') ? 'text-decoration: underline;' : ''; ?>">Directory</a>
 
-                    <a href="index.php?page=feed&tab=private" style="<?php echo ($page === 'feed' && $tab === 'private') ? 'text-decoration: underline;' : ''; ?>">
-                        <?php echo $lang['nav_private']; ?>
-                    </a>
+                    <a href="index.php?page=feed&tab=private" style="<?php echo ($page === 'feed' && $tab === 'private') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_private']; ?></a>
 
-                    <a href="index.php?page=feed&tab=other" style="<?php echo ($page === 'feed' && $tab === 'other') ? 'text-decoration: underline;' : ''; ?>">
-                        <?php echo $lang['nav_other']; ?>
-                    </a>
+                    <a href="index.php?page=feed&tab=other" style="<?php echo ($page === 'feed' && $tab === 'other') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_other']; ?></a>
 
                     <a href="index.php?page=documents" style="<?php echo ($page === 'documents') ? 'text-decoration: underline;' : ''; ?>">
-                        <?php echo $lang['nav_documents']; ?>
-                    </a>
+                        <?php echo $lang['nav_documents']; ?></a>
                 <?php endif; ?>
             </div>
 
@@ -160,6 +153,25 @@ function showAccessDenied($title, $reason)
         }
         ?>
     </div>
+
+    <script>
+        const postArea = document.getElementById('postContent');
+        const charCount = document.getElementById('charCount');
+
+        if (postArea) {
+            postArea.addEventListener('input', function() {
+                const length = this.value.length;
+                charCount.textContent = length;
+
+                // Optional: Change color to red when near the limit
+                if (length >= 450) {
+                    charCount.style.color = '#dc3545'; // Red
+                } else {
+                    charCount.style.color = '#888'; // Grey
+                }
+            });
+        }
+    </script>
 
     <footer style="text-align: center; margin-top: 40px; padding: 20px; color: #888; font-size: 0.85rem;">
         <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
