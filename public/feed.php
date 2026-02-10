@@ -133,38 +133,32 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
     <?php if (empty($posts)): ?>
         <p>No notices found in the <?php echo htmlspecialchars($displayTitle); ?> section.</p>
     <?php else: ?>
-        <?php foreach ($posts as $post): ?>
+        <?php
+        $currentDateHeader = ''; // Variable to track the date of the previous post
+        foreach ($posts as $post):
+            // Extract just the Date (Year-Month-Day)
+            $postDate = date('F j, Y', strtotime($post['created_at']));
+
+            // If this post's date is different from the previous one, show a header
+            if ($postDate !== $currentDateHeader):
+                $currentDateHeader = $postDate;
+        ?>
+                <div class="date-divider" style="margin: 30px 0 15px; border-bottom: 2px solid #eee; padding-bottom: 5px;">
+                    <h4 style="margin: 0; color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                        📅 <?php echo $postDate; ?>
+                    </h4>
+                </div>
+            <?php endif; ?>
+
             <div id="post-<?php echo $post['id']; ?>" style="background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; border-left: 5px solid <?php echo ($post['author_role'] === 'admin') ? '#007bff' : '#28a745'; ?>; position: relative;">
 
                 <div style="margin-bottom: 8px;">
                     <strong style="color: #333;"><?php echo htmlspecialchars($post['username']); ?></strong>
-                    <small style="color: #888; margin-left: 10px;"><?php echo date('M j, g:i a', strtotime($post['created_at'])); ?></small>
+                    <small style="color: #888; margin-left: 10px;"><?php echo date('g:i a', strtotime($post['created_at'])); ?></small>
                 </div>
 
                 <div id="view-mode-<?php echo $post['id']; ?>">
                     <p style="color: #444; line-height: 1.4; margin: 10px 0;"><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
-
-                    <?php if ($userId && ($post['user_id'] == $userId || $userRole === 'admin')): ?>
-                        <div style="display: flex; gap: 8px; margin-top: 10px;">
-                            <button onclick="toggleEdit(<?php echo $post['id']; ?>)" style="background: #ffc107; color: #000; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer;">Edit</button>
-
-                            <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?>" onsubmit="return confirm('Delete this post?');">
-                                <input type="hidden" name="delete_post_id" value="<?php echo $post['id']; ?>">
-                                <input type="hidden" name="return_page" value="<?php echo $pageNumber; ?>">
-                                <button type="submit" style="background: #dc3545; color: white; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer;">Delete</button>
-                            </form>
-                        </div>
-                    <?php endif; ?>
-                </div>
-
-                <div id="edit-mode-<?php echo $post['id']; ?>" style="display: none;">
-                    <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?>">
-                        <input type="hidden" name="update_post_id" value="<?php echo $post['id']; ?>">
-                        <input type="hidden" name="return_page" value="<?php echo $pageNumber; ?>">
-                        <textarea name="edit_content" style="width: 100%; height: 70px; padding: 8px; margin-bottom: 8px; border: 1px solid #ccc; font-family: sans-serif;"><?php echo htmlspecialchars($post['content']); ?></textarea><br>
-                        <button type="submit" style="background: #28a745; color: white; padding: 5px 12px; font-size: 0.75rem; border: none; border-radius: 4px; cursor: pointer;">Save</button>
-                        <button type="button" onclick="toggleEdit(<?php echo $post['id']; ?>)" style="background: #6c757d; color: white; padding: 5px 12px; font-size: 0.75rem; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
-                    </form>
                 </div>
             </div>
         <?php endforeach; ?>

@@ -2,5 +2,5 @@
 session_start();
 $_SESSION = [];
 session_destroy();
-header("Location: index.php?page=feed&tab=general");
+header("Location: index.php?page=feed&tab=public");
 exit;
