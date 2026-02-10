@@ -286,7 +286,6 @@ button:active {
 
 .card-poll:hover {
     border-color: var(--primary);
-    transform: translateY(-2px);
 }
 
 /* Voting Options */
@@ -366,8 +365,21 @@ button:active {
     border-radius: 6px;
 }
 
-/* User Skills Area */
+.edit-button {
+    background: #ffc107;
+    color: #000;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
 
+.edit-button:hover {
+    background: #e0a800;
+}
+
+/* User Skills Area */
 .card {
     background: #fff;
     padding: 20px;
@@ -375,6 +387,10 @@ button:active {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     margin-bottom: 30px;
+}
+
+.card:hover {
+    border-color: var(--primary);
 }
 
 .card-title {
@@ -451,16 +467,48 @@ button:active {
     background: var(--danger-hover);
 }
 
-.edit-button {
-    background: #ffc107;
-    color: #000;
-    padding: 5px 10px;
-    font-size: 0.75rem;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
+/* Profile Area */
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
 }
 
-.edit-button:hover {
-    background: #e0a800;
+.profile-card {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.profile-card:hover {
+    border-color: var(--primary);
+}
+
+.profile-input {
+    width: 90%;
+    padding: 8px;
+    margin: 10px 0;
+}
+
+.danger-card {
+    background: #fff5f5;
+    padding: 20px;
+    border: 1px solid #ffa8a8;
+    border-radius: 8px;
+}
+
+.danger-title {
+    color: #c92a2a;
+    margin-top: 0;
+}
+
+.danger-input {
+    padding: 8px;
+    margin-right: 10px;
+}
+
+.danger-card:hover {
+    border-color: var(--danger-hover);
 }

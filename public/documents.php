@@ -13,7 +13,7 @@ echo "<h2>📜 Building Documents & Info</h2>";
 
 // --- 1. ADMIN ONLY: UPLOAD FORM ---
 if ($userRole === 'admin'): ?>
-    <div class="card" style="border: 1px solid #007bff; margin-bottom: 30px; background: #f8fafc; padding: 20px; border-radius: 8px;">
+    <div class="container">
         <h3 style="margin-top: 0;">➕ Upload New Document</h3>
         <form method="POST" action="add_document.php" enctype="multipart/form-data">
             <div style="margin-bottom: 10px;">

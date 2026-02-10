@@ -155,23 +155,48 @@ $userData = $stmt->fetch();
     </form>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-    <div style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+<div class="profile-grid">
+    <div class="profile-card">
         <h3>Update Email</h3>
         <form method="POST" action="index.php?page=profile">
-            <input type="email" name="email" value="<?php echo htmlspecialchars($userData['email']); ?>" required style="width: 90%; padding: 8px; margin: 10px 0;">
+            <input
+                type="email"
+                name="email"
+                value="<?php echo htmlspecialchars($userData['email']); ?>"
+                required
+                class="profile-input">
+
             <button type="submit" name="update_email" class="primary-button">
                 Save Email
             </button>
         </form>
     </div>
 
-    <div style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+    <div class="profile-card">
         <h3>Change Password</h3>
+
         <form method="POST" action="index.php?page=profile">
-            <input type="password" name="current_password" placeholder="Current Password" required style="width: 90%; padding: 8px; margin-bottom: 10px;">
-            <input type="password" name="new_password" placeholder="New Password" required style="width: 90%; padding: 8px; margin-bottom: 10px;">
-            <input type="password" name="confirm_password" placeholder="Confirm New" required style="width: 90%; padding: 8px; margin-bottom: 15px;">
+            <input
+                type="password"
+                name="current_password"
+                placeholder="Current Password"
+                required
+                class="profile-input">
+
+            <input
+                type="password"
+                name="new_password"
+                placeholder="New Password"
+                required
+                class="profile-input">
+
+            <input
+                type="password"
+                name="confirm_password"
+                placeholder="Confirm New"
+                required
+                class="profile-input profile-input--last">
+
             <button type="submit" name="change_password" class="primary-button">
                 Update Password
             </button>
@@ -179,15 +204,25 @@ $userData = $stmt->fetch();
     </div>
 </div>
 
+
 <hr style="margin: 40px 0; border: 0; border-top: 1px solid #eee;">
 
-<div style="background: #fff5f5; padding: 20px; border: 1px solid #ffa8a8; border-radius: 8px;">
-    <h3 style="color: #c92a2a; margin-top: 0;">Danger Zone</h3>
-    <form method="POST" action="index.php?page=profile" onsubmit="return confirm('Are you sure?');">
-        <input type="password" name="delete_confirm_pass" placeholder="Enter password to confirm" required style="padding: 8px; margin-right: 10px;">
+<div class="danger-card">
+    <h3 class="danger-title">Danger Zone</h3>
+
+    <form
+        method="POST"
+        action="index.php?page=profile"
+        onsubmit="return confirm('Are you sure?');">
+        <input
+            type="password"
+            name="delete_confirm_pass"
+            placeholder="Enter password to confirm"
+            required
+            class="danger-input">
+
         <button type="submit" name="delete_account" class="delete-account-button">
             Delete My Account
         </button>
-
     </form>
 </div>

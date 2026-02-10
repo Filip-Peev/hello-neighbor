@@ -7,8 +7,7 @@ echo "<h2>📊 Community Polls</h2>";
 
 // --- 1. ADMIN: Create Poll ---
 if ($userRole === 'admin'): ?>
-    <div class="card" style="border: 1px solid var(--primary); margin-bottom: 30px; background: #f0f7ff; padding: 20px; border-radius: 8px;">
-        <h3 style="margin-top: 0;">🆕 Create New Community Poll</h3>
+    <div class="container">🆕 Create New Community Poll</h3>
         <form method="POST" action="create_poll.php">
             <label style="font-weight: bold;">Question:</label>
             <input type="text" name="question" placeholder="Enter question..." required
