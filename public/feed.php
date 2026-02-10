@@ -8,6 +8,9 @@ $userRole = $_SESSION['role'] ?? 'guest';
 // Capture the current tab (defaults to public)
 $currentTab = $_GET['tab'] ?? 'public';
 
+// Capture the filter date if provided
+$selectedDate = $_GET['date'] ?? null;
+
 // Pagination logic
 $pageNumber = isset($_GET['p']) ? (int)$_GET['p'] : 1;
 if ($pageNumber < 1) $pageNumber = 1;
@@ -57,13 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['post_content'])) {
         $content = trim($_POST['post_content']);
 
-        // Safety check: Ensure we only use the new keys
         $allowed = ['public', 'private', 'other'];
         $categoryToSave = in_array($currentTab, $allowed) ? $currentTab : 'public';
 
         if (!empty($content)) {
             $stmt = $db->prepare("INSERT INTO posts (user_id, content, category) VALUES (?, ?, ?)");
-            // Explicitly passing $categoryToSave ensures 'general' isn't used
             $stmt->execute([$userId, $content, $categoryToSave]);
         }
         header("Location: index.php?page=feed&tab=$categoryToSave&p=1&msg=posted");
@@ -71,14 +72,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// --- DATA FETCHING (Filtered by New Categories) ---
+// --- DATA FETCHING (Filtered by Categories and Date) ---
 
 $postsPerPage = 10;
 $offset = ($pageNumber - 1) * $postsPerPage;
 
-// Count posts for this specific category
-$stmtCount = $db->prepare("SELECT COUNT(*) FROM posts WHERE category = ?");
-$stmtCount->execute([$currentTab]);
+// Build the WHERE clause dynamically
+$whereClause = "WHERE posts.category = ?";
+$params = [$currentTab];
+
+if ($selectedDate) {
+    $whereClause .= " AND DATE(posts.created_at) = ?";
+    $params[] = $selectedDate;
+}
+
+// Count posts for this specific query
+$stmtCount = $db->prepare("SELECT COUNT(*) FROM posts $whereClause");
+$stmtCount->execute($params);
 $totalPosts = $stmtCount->fetchColumn();
 $totalPages = ceil($totalPosts / $postsPerPage);
 
@@ -86,13 +96,12 @@ $totalPages = ceil($totalPosts / $postsPerPage);
 $stmt = $db->prepare("SELECT posts.*, users.username, users.role as author_role 
                       FROM posts 
                       JOIN users ON posts.user_id = users.id 
-                      WHERE posts.category = ? 
+                      $whereClause 
                       ORDER BY posts.created_at DESC 
                       LIMIT $postsPerPage OFFSET $offset");
-$stmt->execute([$currentTab]);
+$stmt->execute($params);
 $posts = $stmt->fetchAll();
 
-// Map new keys to readable titles
 $titles = [
     'public'  => 'Public Info',
     'private' => 'Private Board',
@@ -129,26 +138,43 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
     <?php endif; ?>
 </div>
 
+<div class="filter-container" style="margin-bottom: 20px; padding: 15px; background: #f4f4f4; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+    <form method="GET" action="index.php" style="display: flex; align-items: center; gap: 10px; margin: 0;">
+        <input type="hidden" name="page" value="feed">
+        <input type="hidden" name="tab" value="<?php echo htmlspecialchars($currentTab); ?>">
+        
+        <label for="filter_date"><strong>Jump to Date:</strong></label>
+        <input type="date" id="filter_date" name="date" 
+               value="<?php echo htmlspecialchars($selectedDate ?? ''); ?>" 
+               style="padding: 5px; border-radius: 4px; border: 1px solid #ccc; width: auto; margin-bottom: 0;">
+        
+        <button type="submit" style="padding: 5px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Go</button>
+        
+        <?php if ($selectedDate): ?>
+            <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>" style="font-size: 0.8rem; color: #dc3545; text-decoration: none;">Clear Filter</a>
+        <?php endif; ?>
+    </form>
+</div>
+
 <div class="feed-container">
     <?php if (empty($posts)): ?>
         <p>No notices found in the <?php echo htmlspecialchars($displayTitle); ?> section.</p>
     <?php else: ?>
-        <?php
-        $currentDateHeader = ''; // Variable to track the date of the previous post
-        foreach ($posts as $post):
-            // Extract just the Date (Year-Month-Day)
+        <?php 
+        $currentDateHeader = ''; 
+        foreach ($posts as $post): 
             $postDate = date('F j, Y', strtotime($post['created_at']));
-
-            // If this post's date is different from the previous one, show a header
+            
+            // Show Date Header if the date changes
             if ($postDate !== $currentDateHeader):
                 $currentDateHeader = $postDate;
         ?>
-                <div class="date-divider" style="margin: 30px 0 15px; border-bottom: 2px solid #eee; padding-bottom: 5px;">
-                    <h4 style="margin: 0; color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
-                        📅 <?php echo $postDate; ?>
-                    </h4>
-                </div>
-            <?php endif; ?>
+            <div class="date-divider" style="margin: 30px 0 15px; border-bottom: 2px solid #eee; padding-bottom: 5px;">
+                <h4 style="margin: 0; color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                    📅 <?php echo $postDate; ?>
+                </h4>
+            </div>
+        <?php endif; ?>
 
             <div id="post-<?php echo $post['id']; ?>" style="background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; border-left: 5px solid <?php echo ($post['author_role'] === 'admin') ? '#007bff' : '#28a745'; ?>; position: relative;">
 
@@ -159,6 +185,28 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 
                 <div id="view-mode-<?php echo $post['id']; ?>">
                     <p style="color: #444; line-height: 1.4; margin: 10px 0;"><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
+
+                    <?php if ($userId && ($post['user_id'] == $userId || $userRole === 'admin')): ?>
+                        <div style="display: flex; gap: 8px; margin-top: 10px;">
+                            <button onclick="toggleEdit(<?php echo $post['id']; ?>)" style="background: #ffc107; color: #000; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer;">Edit</button>
+
+                            <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?>" onsubmit="return confirm('Delete this post?');">
+                                <input type="hidden" name="delete_post_id" value="<?php echo $post['id']; ?>">
+                                <input type="hidden" name="return_page" value="<?php echo $pageNumber; ?>">
+                                <button type="submit" style="background: #dc3545; color: white; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer;">Delete</button>
+                            </form>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div id="edit-mode-<?php echo $post['id']; ?>" style="display: none;">
+                    <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?>">
+                        <input type="hidden" name="update_post_id" value="<?php echo $post['id']; ?>">
+                        <input type="hidden" name="return_page" value="<?php echo $pageNumber; ?>">
+                        <textarea name="edit_content" style="width: 100%; height: 70px; padding: 8px; margin-bottom: 8px; border: 1px solid #ccc; font-family: sans-serif;"><?php echo htmlspecialchars($post['content']); ?></textarea><br>
+                        <button type="submit" style="background: #28a745; color: white; padding: 5px 12px; font-size: 0.75rem; border: none; border-radius: 4px; cursor: pointer;">Save</button>
+                        <button type="button" onclick="toggleEdit(<?php echo $post['id']; ?>)" style="background: #6c757d; color: white; padding: 5px 12px; font-size: 0.75rem; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+                    </form>
                 </div>
             </div>
         <?php endforeach; ?>
@@ -166,15 +214,16 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 </div>
 
 <?php if ($totalPages > 1): ?>
+    <?php $dateQuery = $selectedDate ? "&date=" . urlencode($selectedDate) : ""; ?>
     <div class="pagination" style="margin-top: 30px; display: flex; justify-content: center; gap: 15px; align-items: center;">
         <?php if ($pageNumber > 1): ?>
-            <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber - 1; ?>" style="text-decoration: none; color: #28a745; font-weight: bold;">&laquo; Newer</a>
+            <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo ($pageNumber - 1) . $dateQuery; ?>" style="text-decoration: none; color: #28a745; font-weight: bold;">&laquo; Newer</a>
         <?php endif; ?>
 
         <span style="color: #666;">Page <?php echo $pageNumber; ?> of <?php echo $totalPages; ?></span>
 
         <?php if ($pageNumber < $totalPages): ?>
-            <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber + 1; ?>" style="text-decoration: none; color: #28a745; font-weight: bold;">Older &raquo;</a>
+            <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo ($pageNumber + 1) . $dateQuery; ?>" style="text-decoration: none; color: #28a745; font-weight: bold;">Older &raquo;</a>
         <?php endif; ?>
     </div>
 <?php endif; ?>
