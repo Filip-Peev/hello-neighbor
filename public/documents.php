@@ -68,7 +68,7 @@ foreach ($categories as $key => $label) {
             $ext = !empty($doc['file_path']) ? strtolower(pathinfo($doc['file_path'], PATHINFO_EXTENSION)) : '';
             $icon = ($ext === 'pdf') ? '📕' : '🖼️';
 
-            echo "<div class='card' style='padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px; position: relative; background: #fff;'>";
+            echo "<div class='card'>";
 
             // Delete Button for Admins
             if ($userRole === 'admin') {

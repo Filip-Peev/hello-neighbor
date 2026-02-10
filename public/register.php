@@ -48,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <h3>Create an Account</h3>
 <form method="POST" action="index.php?page=register">
-    <input type="text" name="username" placeholder="Username" required><br>
+    <input type="text" maxlength="50" minlength="2" name="username" placeholder="Username" required><br>
     <input type="email" name="email" placeholder="Email" required><br>
-    <input type="password" name="password" placeholder="Password" required><br>
+    <input type="password" maxlength="50" minlength="2" name="password" placeholder="Password" required><br>
     <button type="submit">Join Now</button>
 </form>

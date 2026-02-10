@@ -179,6 +179,8 @@ button:active {
 
 [id^="post-"]:hover {
     border-color: var(--primary) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
 /* --- Comments --- */
@@ -198,7 +200,7 @@ button:active {
 }
 
 /* --- Responsive (Mobile) --- */
-@media (max-width: 900px) {
+@media (max-width: 940px) {
     .nav-container {
         flex-direction: column;
         gap: 15px;
@@ -286,6 +288,8 @@ button:active {
 
 .card-poll:hover {
     border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
 /* Voting Options */
@@ -391,6 +395,8 @@ button:active {
 
 .card:hover {
     border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
 .card-title {
@@ -484,6 +490,8 @@ button:active {
 
 .profile-card:hover {
     border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
 .profile-input {
@@ -499,6 +507,12 @@ button:active {
     border-radius: 8px;
 }
 
+.danger-card:hover {
+    border-color: var(--danger-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
 .danger-title {
     color: #c92a2a;
     margin-top: 0;
@@ -507,10 +521,6 @@ button:active {
 .danger-input {
     padding: 8px;
     margin-right: 10px;
-}
-
-.danger-card:hover {
-    border-color: var(--danger-hover);
 }
 
 /* --- Neighbor Summary Badge --- */
@@ -528,4 +538,267 @@ button:active {
     text-overflow: ellipsis;
     vertical-align: middle;
     border: 1px solid #cbd5e1;
+}
+
+.neighbor-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease;
+}
+
+.neighbor-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.neighbor-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.neighbor-avatar {
+    width: 45px;
+    height: 45px;
+    background: #e2e8f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #475569;
+    font-size: 1.2rem;
+}
+
+.neighbor-name {
+    display: block;
+    font-size: 1.1rem;
+    color: var(--text-main);
+}
+
+.neighbor-role {
+    color: var(--primary);
+    font-size: 0.7rem;
+    vertical-align: middle;
+}
+
+.neighbor-meta {
+    color: #94a3b8;
+}
+
+.neighbor-summary-box {
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+    min-height: 60px;
+    border: 1px solid #cbd5e1;
+}
+
+.neighbor-summary {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #334155;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.neighbor-summary-empty {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #94a3b8;
+    font-style: italic;
+}
+
+/* Logo image with subtle inner pulsing glow */
+.logo-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.glow-logo {
+    height: 40px;
+    width: auto;
+    border-radius: 4px;
+    animation: pulseGlow 3s infinite;
+    /* make the image glow inside */
+    filter: brightness(1.2) drop-shadow(0 0 3px rgba(255, 255, 255, 0.6));
+}
+
+@keyframes pulseGlow {
+
+    0%,
+    100% {
+        filter: brightness(1.1) drop-shadow(0 0 2px rgba(255, 255, 255, 0.4));
+    }
+
+    50% {
+        filter: brightness(1.3) drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+    }
+}
+
+.logo-text {
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+/* Global box-sizing */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Directory header and form */
+.directory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.directory-header h2 {
+    font-size: 1.5rem;
+}
+
+.directory-search-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.directory-search-form input[name="search"] {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 250px;
+    max-width: 100%;
+}
+
+.directory-search-form button {
+    background: var(--primary, #007bff);
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 250px;
+}
+
+.clear-search {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-decoration: underline;
+    color: #007bff;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Description text */
+.directory-description {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+/* Neighbor cards grid */
+.neighbor-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+/* Individual neighbor card */
+.neighbor-card {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.neighbor-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.neighbor-avatar {
+    width: 40px;
+    height: 40px;
+    background: #007bff;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.neighbor-name {
+    font-size: 1rem;
+}
+
+.neighbor-role {
+    font-size: 0.8rem;
+    color: #888;
+    margin-left: 5px;
+}
+
+.neighbor-meta {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.neighbor-summary-box {
+    margin-top: 10px;
+}
+
+.neighbor-summary,
+.neighbor-summary-empty {
+    font-size: 0.9rem;
+    color: #333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 500px) {
+    .directory-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .directory-search-form {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .neighbor-grid {
+        grid-template-columns: 1fr;
+        /* stack cards */
+    }
+
+    .search-wrapper {
+        max-width: 100%;
+    }
 }

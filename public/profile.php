@@ -146,7 +146,7 @@ $userData = $stmt->fetch();
     <form method="POST" action="index.php?page=profile">
         <textarea
             name="summary"
-            class="summary-textarea"
+            class="summary-textarea" maxlength="500" minlength="2"
             placeholder="Write a short summary of your skills or how you can help..."><?php echo htmlspecialchars($userData['summary'] ?? ''); ?></textarea>
 
         <button type="submit" name="update_summary" class="primary-button">

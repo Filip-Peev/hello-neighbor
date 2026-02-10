@@ -27,6 +27,18 @@ try {
 
 $page = $_GET['page'] ?? 'feed';
 $tab = $_GET['tab'] ?? 'public';
+
+/**
+ * Helper function to display a consistent "Access Denied" message
+ */
+function showAccessDenied($title, $reason)
+{
+    echo "<div style='text-align: center; padding: 40px 20px;'>";
+    echo "<h2>🔒 Member Access Only</h2>";
+    echo "<p>Access to <strong>$title</strong> ($reason) is reserved for registered residents.</p>";
+    echo "<p>Please <a href='index.php?page=login' style='color: var(--primary); font-weight: bold;'>Login</a> or <a href='index.php?page=register' style='color: var(--primary); font-weight: bold;'>Register</a> to continue.</p>";
+    echo "</div>";
+}
 ?>
 
 <!DOCTYPE html>
@@ -44,31 +56,54 @@ $tab = $_GET['tab'] ?? 'public';
     <nav>
         <div class="nav-container">
             <div class="nav-left">
-                <a href="index.php?page=feed&tab=public" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
-                    <img src="../config/logo.webp" alt="Hello Neighbor Logo" style="height: 40px; width: auto; border-radius: 4px;">
-                    <span style="font-size: 1.2rem; letter-spacing: 0.5px;">Hello Neighbor</span>
+                <a href="index.php?page=feed&tab=public" class="logo-link">
+                    <img src="../config/logo.webp" alt="Hello Neighbor Logo" class="glow-logo">
+                    <span class="logo-text">Hello Neighbor</span>
                 </a>
 
-                <a href="index.php?page=feed&tab=public" style="<?php echo ($page === 'feed' && $tab === 'public') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_public']; ?></a>
 
-                <a href="index.php?page=polls" style="<?php echo ($page === 'polls') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_polls']; ?></a>
+                <a href="index.php?page=feed&tab=public" style="<?php echo ($page === 'feed' && $tab === 'public') ? 'text-decoration: underline;' : ''; ?>">
+                    <?php echo $lang['nav_public']; ?>
+                </a>
+
+                <a href="index.php?page=polls" style="<?php echo ($page === 'polls') ? 'text-decoration: underline;' : ''; ?>">
+                    <?php echo $lang['nav_polls']; ?>
+                </a>
 
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="index.php?page=feed&tab=private" style="<?php echo ($page === 'feed' && $tab === 'private') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_private']; ?></a>
-                    <a href="index.php?page=feed&tab=other" style="<?php echo ($page === 'feed' && $tab === 'other') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_other']; ?></a>
-                    <a href="index.php?page=documents" style="<?php echo ($page === 'documents') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_documents']; ?></a>
+                    <a href="index.php?page=directory" style="<?php echo ($page === 'directory') ? 'text-decoration: underline;' : ''; ?>">
+                        Directory
+                    </a>
+
+                    <a href="index.php?page=feed&tab=private" style="<?php echo ($page === 'feed' && $tab === 'private') ? 'text-decoration: underline;' : ''; ?>">
+                        <?php echo $lang['nav_private']; ?>
+                    </a>
+
+                    <a href="index.php?page=feed&tab=other" style="<?php echo ($page === 'feed' && $tab === 'other') ? 'text-decoration: underline;' : ''; ?>">
+                        <?php echo $lang['nav_other']; ?>
+                    </a>
+
+                    <a href="index.php?page=documents" style="<?php echo ($page === 'documents') ? 'text-decoration: underline;' : ''; ?>">
+                        <?php echo $lang['nav_documents']; ?>
+                    </a>
                 <?php endif; ?>
             </div>
 
             <div class="nav-right">
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="index.php?page=profile" style="<?php echo $page === 'profile' ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_profile']; ?></a>
+                    <a href="index.php?page=profile" style="<?php echo $page === 'profile' ? 'text-decoration: underline;' : ''; ?>">
+                        <?php echo $lang['nav_profile']; ?>
+                    </a>
 
                     <span style="color: #aaa;">| Welcome, <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong></span>
                     <a href="logout.php" style="color: #ff6666;"><?php echo $lang['nav_logout']; ?></a>
                 <?php else: ?>
-                    <a href="index.php?page=register" style="<?php echo $page === 'register' ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_register']; ?></a>
-                    <a href="index.php?page=login" style="<?php echo $page === 'login' ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_login']; ?></a>
+                    <a href="index.php?page=register" style="<?php echo $page === 'register' ? 'text-decoration: underline;' : ''; ?>">
+                        <?php echo $lang['nav_register']; ?>
+                    </a>
+                    <a href="index.php?page=login" style="<?php echo $page === 'login' ? 'text-decoration: underline;' : ''; ?>">
+                        <?php echo $lang['nav_login']; ?>
+                    </a>
                 <?php endif; ?>
             </div>
         </div>
@@ -77,29 +112,47 @@ $tab = $_GET['tab'] ?? 'public';
     <div class="container">
         <?php
         switch ($page) {
+            case 'directory':
+                if (!isset($_SESSION['user_id'])) {
+                    showAccessDenied("Directory", "the neighbor list and skills search");
+                } else {
+                    include 'directory.php';
+                }
+                break;
+
             case 'polls':
                 include 'polls.php';
                 break;
+
             case 'register':
                 include 'register.php';
                 break;
+
             case 'documents':
-                include 'documents.php';
+                if (!isset($_SESSION['user_id'])) {
+                    showAccessDenied("Documents", "building files and records");
+                } else {
+                    include 'documents.php';
+                }
                 break;
+
             case 'login':
                 include 'login.php';
                 break;
+
             case 'profile':
-                include 'profile.php';
+                if (!isset($_SESSION['user_id'])) {
+                    showAccessDenied("Profile", "your personal settings");
+                } else {
+                    include 'profile.php';
+                }
                 break;
+
             case 'feed':
             default:
-                // SECURITY: Prevent guests from seeing 'private' or 'other' content via URL manipulation
                 $protectedTabs = ['private', 'other'];
                 if (in_array($tab, $protectedTabs) && !isset($_SESSION['user_id'])) {
-                    echo "<h2>🔒 Member Access Only</h2>";
-                    echo "<p>The content in <strong>" . ucfirst($tab) . "</strong> is reserved for registered residents.</p>";
-                    echo "<p>Please <a href='index.php?page=login'>Login</a> or <a href='index.php?page=register'>Register</a> to continue.</p>";
+                    showAccessDenied(ucfirst($tab), "resident-only discussions");
                 } else {
                     include 'feed.php';
                 }
@@ -114,10 +167,17 @@ $tab = $_GET['tab'] ?? 'public';
         <div style="display: inline-block; margin-right: 20px;">
             <a href="mailto:filip@filip-peev.com" style="color: #007bff; text-decoration: none; font-weight: bold;">Feedback</a>
         </div>
-        <div class="lang-switcher" style="display: inline-block; font-weight: bold;">
-            <a href="?lang=en" style="color: <?php echo $lang_code === 'en' ? 'var(--primary)' : '#aaa'; ?>;">EN</a> |
-            <a href="?lang=bg" style="color: <?php echo $lang_code === 'bg' ? 'var(--primary)' : '#aaa'; ?>;">BG</a>
-        </div>
+
+        <?php
+        // Flag to control the visibility of the language switcher
+        $not_fully_implemented_yet = true;
+        if (!$not_fully_implemented_yet): ?>
+            <div class="lang-switcher" style="display: inline-block; font-weight: bold;">
+                <a href="?lang=en" style="color: <?php echo $lang_code === 'en' ? 'var(--primary)' : '#aaa'; ?>;">EN</a> |
+                <a href="?lang=bg" style="color: <?php echo $lang_code === 'bg' ? 'var(--primary)' : '#aaa'; ?>;">BG</a>
+            </div>
+        <?php endif; ?>
+
     </footer>
 
 </body>

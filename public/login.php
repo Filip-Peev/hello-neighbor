@@ -42,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php if (!$loginSuccess): ?>
     <h3>Login to Your Account</h3>
     <form id="loginForm" method="POST" action="index.php?page=login">
-        <input type="text" name="identifier" placeholder="Username or Email" required><br>
-        <input type="password" name="password" placeholder="Password" required><br>
+        <input type="text" maxlength="50" minlength="2" name="identifier" placeholder="Username or Email" required><br>
+        <input type="password" maxlength="50" minlength="2" name="password" placeholder="Password" required><br>
         <button type="submit" id="loginBtn">Login</button>
     </form>
 <?php endif; ?>
