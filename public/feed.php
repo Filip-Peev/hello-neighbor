@@ -139,19 +139,22 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 </div>
 
 <div class="filter-container" style="margin-bottom: 20px; padding: 15px; background: #f4f4f4; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
-    <form method="GET" action="index.php" style="display: flex; align-items: center; gap: 10px; margin: 0;">
+    <form id="dateFilterForm" method="GET" action="index.php" style="display: flex; align-items: center; gap: 10px; margin: 0;">
         <input type="hidden" name="page" value="feed">
         <input type="hidden" name="tab" value="<?php echo htmlspecialchars($currentTab); ?>">
         
         <label for="filter_date"><strong>Jump to Date:</strong></label>
         <input type="date" id="filter_date" name="date" 
                value="<?php echo htmlspecialchars($selectedDate ?? ''); ?>" 
-               style="padding: 5px; border-radius: 4px; border: 1px solid #ccc; width: auto; margin-bottom: 0;">
+               onchange="document.getElementById('dateFilterForm').submit();"
+               style="padding: 5px; border-radius: 4px; border: 1px solid #ccc; width: auto; margin-bottom: 0; cursor: pointer;">
         
-        <button type="submit" style="padding: 5px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Go</button>
+        <noscript>
+            <button type="submit" style="padding: 5px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Go</button>
+        </noscript>
         
         <?php if ($selectedDate): ?>
-            <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>" style="font-size: 0.8rem; color: #dc3545; text-decoration: none;">Clear Filter</a>
+            <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>" style="font-size: 0.8rem; color: #dc3545; text-decoration: none; font-weight: bold;">✕ Clear Filter</a>
         <?php endif; ?>
     </form>
 </div>
