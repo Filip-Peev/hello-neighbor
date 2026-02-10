@@ -10,7 +10,7 @@ if (!in_array($lang_code, $supported_langs)) {
 }
 
 $_SESSION['lang'] = $lang_code;
-$lang = include "../config/languages/{$lang_code}.php";
+$lang = include "../languages/{$lang_code}.php";
 
 if (!file_exists(__DIR__ . '/../.env')) {
     header("Location: install.php");
@@ -51,18 +51,13 @@ $tab = $_GET['tab'] ?? 'public';
 
                 <a href="index.php?page=feed&tab=public" style="<?php echo ($page === 'feed' && $tab === 'public') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_public']; ?></a>
 
-                <a href="index.php?page=polls">Polls</a>
+                <a href="index.php?page=polls" style="<?php echo ($page === 'polls') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_polls']; ?></a>
 
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="index.php?page=feed&tab=private" style="<?php echo ($page === 'feed' && $tab === 'private') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_private']; ?></a>
-                    <a href="index.php?page=feed&tab=other" style="<?php echo ($page === 'feed' && $tab === 'other') ? 'text-decoration: underline;' : ''; ?>">Other</a>
-                    <a href="index.php?page=documents" style="<?php echo ($page === 'documents') ? 'text-decoration: underline;' : ''; ?>">Documents</a>
+                    <a href="index.php?page=feed&tab=other" style="<?php echo ($page === 'feed' && $tab === 'other') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_other']; ?></a>
+                    <a href="index.php?page=documents" style="<?php echo ($page === 'documents') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_documents']; ?></a>
                 <?php endif; ?>
-            </div>
-
-            <div class="lang-switcher" style="margin-left: 20px; font-weight: bold;">
-                <a href="?lang=en" style="color: <?php echo $lang_code === 'en' ? 'var(--primary)' : '#aaa'; ?>;">EN</a> |
-                <a href="?lang=bg" style="color: <?php echo $lang_code === 'bg' ? 'var(--primary)' : '#aaa'; ?>;">BG</a>
             </div>
 
             <div class="nav-right">
@@ -72,8 +67,8 @@ $tab = $_GET['tab'] ?? 'public';
                     <span style="color: #aaa;">| Welcome, <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong></span>
                     <a href="logout.php" style="color: #ff6666;"><?php echo $lang['nav_logout']; ?></a>
                 <?php else: ?>
-                    <a href="index.php?page=register" style="<?php echo $page === 'register' ? 'text-decoration: underline;' : ''; ?>">Register</a>
-                    <a href="index.php?page=login" style="<?php echo $page === 'login' ? 'text-decoration: underline;' : ''; ?>">Login</a>
+                    <a href="index.php?page=register" style="<?php echo $page === 'register' ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_register']; ?></a>
+                    <a href="index.php?page=login" style="<?php echo $page === 'login' ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_login']; ?></a>
                 <?php endif; ?>
             </div>
         </div>
@@ -116,7 +111,13 @@ $tab = $_GET['tab'] ?? 'public';
     <footer style="text-align: center; margin-top: 40px; padding: 20px; color: #888; font-size: 0.85rem;">
         <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
         <p>&copy; <?php echo date('Y'); ?> Hello Neighbor - <em>Unofficial Learning Web App</em></p>
-        <a href="mailto:filip@filip-peev.com" style="color: #007bff; text-decoration: none; font-weight: bold;">Feedback</a>
+        <div style="display: inline-block; margin-right: 20px;">
+            <a href="mailto:filip@filip-peev.com" style="color: #007bff; text-decoration: none; font-weight: bold;">Feedback</a>
+        </div>
+        <div class="lang-switcher" style="display: inline-block; font-weight: bold;">
+            <a href="?lang=en" style="color: <?php echo $lang_code === 'en' ? 'var(--primary)' : '#aaa'; ?>;">EN</a> |
+            <a href="?lang=bg" style="color: <?php echo $lang_code === 'bg' ? 'var(--primary)' : '#aaa'; ?>;">BG</a>
+        </div>
     </footer>
 
 </body>

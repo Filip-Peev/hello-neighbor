@@ -18,7 +18,7 @@ if ($_SESSION['role'] === 'admin' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if (in_array($ext, $allowed)) {
             // Generate a unique name to prevent overwriting
             $newName = bin2hex(random_bytes(8)) . "." . $ext;
-            $uploadPath = __DIR__ . "/uploads/" . $newName;
+            $uploadPath = __DIR__ . "/../uploads/" . $newName;
 
             if (move_uploaded_file($_FILES['doc_file']['tmp_name'], $uploadPath)) {
                 $stmt = $db->prepare("INSERT INTO documents (title, description, file_path, category) VALUES (?, ?, ?, ?)");

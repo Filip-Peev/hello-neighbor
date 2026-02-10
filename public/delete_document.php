@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     if ($doc) {
         // 2. Identify the full path on the server
         // Using __DIR__ ensures we are looking in the right folder relative to this script
-        $filePath = __DIR__ . "/uploads/" . $doc['file_path'];
+        $filePath = __DIR__ . "/../uploads/" . $doc['file_path'];
 
         // 3. Delete the physical file if it exists
         if (!empty($doc['file_path']) && file_exists($filePath)) {

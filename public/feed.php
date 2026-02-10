@@ -112,6 +112,19 @@ $stmt = $db->prepare("SELECT posts.*, users.username, users.role as author_role
 $stmt->execute($params);
 $posts = $stmt->fetchAll();
 
+// Fitz
+$latestDateWithPosts = null;
+if (empty($posts)) {
+    // Find the most recent date in this category that actually has posts
+    $stmtLatest = $db->prepare("SELECT DATE(created_at) as last_date 
+                                FROM posts 
+                                WHERE category = ? 
+                                ORDER BY created_at DESC 
+                                LIMIT 1");
+    $stmtLatest->execute([$currentTab]);
+    $latestDateWithPosts = $stmtLatest->fetchColumn();
+}
+
 $titles = [
     'public'  => 'Public Info',
     'private' => 'Private Board',
@@ -151,7 +164,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
     <?php else: ?>
         <p style="text-align: center; color: #666;">
             <strong>Want to post here?</strong> <br>
-            Please <a href="index.php?page=login">Login</a> or <a href="index.php?page=register">Register</a>.
+            Please <a href="index.php?page=login"><?php echo $lang['nav_login']; ?></a> or <a href="index.php?page=register"><?php echo $lang['nav_register']; ?></a>.
         </p>
     <?php endif; ?>
 </div>
@@ -193,7 +206,20 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 
 <div class="feed-container">
     <?php if (empty($posts)): ?>
-        <p>No notices found in the <?php echo htmlspecialchars($displayTitle); ?> section.</p>
+        <div style="text-align: center; padding: 40px 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px; color: #666;">
+            <p style="font-size: 1.1rem; margin-bottom: 10px;">📭 No notices found in <strong><?php echo htmlspecialchars($displayTitle); ?></strong> for this date.</p>
+            
+            <?php if ($latestDateWithPosts): ?>
+                <p>Would you like to see the latest activity from 
+                   <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>&date=<?php echo $latestDateWithPosts; ?>" 
+                      style="color: #28a745; font-weight: bold; text-decoration: underline;">
+                      <?php echo date('F j, Y', strtotime($latestDateWithPosts)); ?>
+                   </a>?
+                </p>
+            <?php else: ?>
+                <p>There are no posts in this section yet.</p>
+            <?php endif; ?>
+        </div>
     <?php else: ?>
         <?php
         $currentDateHeader = '';
@@ -265,7 +291,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
                                 <input type="hidden" name="return_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
                                 <input type="text" name="comment_content" placeholder="Add a comment..." required
                                     style="width: 80%; padding: 5px; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
-                                <button type="submit" style="padding: 4px 10px; font-size: 0.8rem;"><?php echo $lang['btn_reply']; ?></button>
+                                <button type="submit" class="btn-comment-reply"><?php echo $lang['btn_reply']; ?></button>
                             </form>
                         <?php endif; ?>
                     </div>

@@ -69,9 +69,8 @@ nav a:hover {
 .container {
     max-width: 900px;
     margin: 0 auto 40px;
-    /* Centers the feed and gives bottom space */
     background: var(--bg-card);
-    padding: 30px;
+    padding: 20px;
     border-radius: 12px;
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow);
@@ -89,7 +88,6 @@ h3 {
 input,
 textarea,
 select {
-    margin-bottom: 15px;
     padding: 10px 14px;
     width: 100%;
     box-sizing: border-box;
@@ -124,6 +122,27 @@ button:hover {
 
 button:active {
     transform: translateY(1px);
+}
+
+.btn-remove-comment {
+    background: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-comment-reply {
+    background: var(--success);
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+}
+
+.btn-comment-reply:hover {
+    background: #ffffffb3;
 }
 
 /* --- The Feed Components --- */
@@ -197,14 +216,49 @@ button:active {
         border-radius: 0;
     }
 
-    /* Hide welcome text on mobile to save space */
     .nav-right span {
         display: none;
     }
 }
 
-/* Profile Grid Fix */
-@media (min-width: 601px) {
+@media (max-width: 600px) {
+    .nav-container {
+        gap: 5px;
+        padding: 10px 0;
+        align-items: center;
+    }
+
+    .nav-left,
+    .nav-right {
+        flex-direction: column;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .nav-left a,
+    .nav-right a {
+        width: 100%;
+        text-align: center;
+    }
+
+    .container {
+        margin: 10px;
+        padding: 20px;
+    }
+
+    nav {
+        margin-top: 0;
+        border-radius: 0;
+    }
+
+    .nav-right span {
+        display: none;
+    }
+
+    .comments-container {
+        margin-left: 0px
+    }
+
     .profile-grid {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
@@ -212,9 +266,96 @@ button:active {
     }
 }
 
-.card-poll:hover {
-    border-color: var(--primary) !important;
+/* --- Polls Section --- */
+.card-poll {
+    position: relative;
+    margin-bottom: 25px;
+    padding: 25px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-card);
     box-shadow: var(--shadow);
+    transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-#post-73>div:nth-child(3)>div:nth-child(1)
+.card-poll:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+/* Voting Options */
+.poll-option-label {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.poll-option-label:hover {
+    background-color: #f1f5f9;
+    border-color: var(--primary);
+}
+
+.poll-option-label input[type="radio"] {
+    margin: 0 12px 0 0;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+/* Results & Progress Bars */
+.poll-result-item {
+    margin-bottom: 15px;
+}
+
+.poll-result-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+
+.poll-progress-bg {
+    background: #e2e8f0;
+    border-radius: 10px;
+    height: 12px;
+    width: 100%;
+    overflow: hidden;
+}
+
+@keyframes growBar {
+    from {
+        width: 0;
+    }
+}
+
+.poll-progress-fill {
+    background: var(--primary);
+    height: 100%;
+    border-radius: 10px;
+    animation: growBar 1s ease-out forwards;
+    display: block;
+}
+
+/* Badges & Details */
+.poll-badge-private {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.voter-audit {
+    margin-top: 15px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    background: var(--bg-body);
+    padding: 12px;
+    border-radius: 6px;
+}

@@ -11,9 +11,9 @@ if ($userRole === 'admin'): ?>
         <h3 style="margin-top: 0;">🆕 Create New Community Poll</h3>
         <form method="POST" action="create_poll.php">
             <label style="font-weight: bold;">Question:</label>
-            <input type="text" name="question" placeholder="Enter question..." required 
-                   style="width:100%; margin: 10px 0 15px 0; padding:10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-            
+            <input type="text" name="question" placeholder="Enter question..." required
+                style="width:100%; margin: 10px 0 15px 0; padding:10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+
             <div style="margin-bottom: 15px;">
                 <label style="font-weight: bold;">Visibility:</label>
                 <select name="category" style="width:100%; margin-top: 5px; padding:10px; border: 1px solid #ccc; border-radius: 4px;">
@@ -27,7 +27,7 @@ if ($userRole === 'admin'): ?>
                 <input type="text" name="options[]" placeholder="Option 1" required style="width:100%; margin-bottom:8px; padding:8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
                 <input type="text" name="options[]" placeholder="Option 2" required style="width:100%; margin-bottom:8px; padding:8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
             </div>
-            
+
             <button type="button" onclick="addOption()" style="background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-bottom: 15px;">+ Add Another Option</button>
             <br>
             <button type="submit" style="background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">Publish Poll</button>
@@ -37,12 +37,14 @@ if ($userRole === 'admin'): ?>
         function addOption() {
             const container = document.getElementById('options-list');
             const input = document.createElement('input');
-            input.type = 'text'; input.name = 'options[]'; input.placeholder = 'Next Option';
+            input.type = 'text';
+            input.name = 'options[]';
+            input.placeholder = 'Next Option';
             input.style = "width:100%; margin-bottom:8px; padding:8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;";
             container.appendChild(input);
         }
     </script>
-<?php endif; 
+<?php endif;
 
 // --- 2. LIST POLLS ---
 if ($userId) {
@@ -56,9 +58,8 @@ foreach ($polls as $poll) {
     $postedDate = date("M j, Y", strtotime($poll['created_at']));
     $isPrivate = ($poll['category'] === 'private');
 
-    echo "<div class='card-poll' style='position: relative; margin-bottom: 20px; padding: 20px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-card); box-shadow: var(--shadow);'>";
-    
-    // Admin Delete
+    echo "<div class='card-poll'>";
+
     if ($userRole === 'admin') {
         echo "<form method='POST' action='delete_poll.php' onsubmit='return confirm(\"Delete this poll?\");' style='position: absolute; top: 15px; right: 15px;'>";
         echo "<input type='hidden' name='poll_id' value='{$poll['id']}'>";
@@ -67,8 +68,8 @@ foreach ($polls as $poll) {
     }
 
     echo "<h3 style='margin: 0; padding-right: 80px; color: var(--primary);'>" . htmlspecialchars($poll['question']) . "</h3>";
-    
-    $badge = $isPrivate ? "<span style='background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px; font-weight:bold; margin-left: 10px;'>🔒 Private</span>" : "";
+
+    $badge = $isPrivate ? "<span class='poll-badge-private'>🔒 Private</span>" : "";
     echo "<p style='font-size: 0.75rem; color: var(--text-muted); margin: 5px 0 15px 0;'>📅 $postedDate $badge</p>";
 
     $hasVoted = false;
@@ -85,32 +86,30 @@ foreach ($polls as $poll) {
     $totalVotes = array_sum(array_column($options, 'vote_count'));
 
     if ($hasVoted || !$userId) {
-        // --- RESULTS VIEW ---
         foreach ($options as $option) {
             $percent = $totalVotes > 0 ? round(($option['vote_count'] / $totalVotes) * 100) : 0;
-            echo "<div style='margin-bottom: 12px;'>";
-            echo "<div style='display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px;'>";
+            echo "<div class='poll-result-item'>";
+            echo "<div class='poll-result-info'>";
             echo "<span>" . htmlspecialchars($option['option_text']) . ($userId && $userVote['option_id'] == $option['id'] ? " <strong>(Yours)</strong>" : "") . "</span>";
             echo "<span>$percent%</span>";
             echo "</div>";
-            echo "<div style='background: #e2e8f0; border-radius: 10px; height: 10px; width: 100%; overflow: hidden;'>";
-            echo "<div style='background: var(--primary); height: 100%; width: {$percent}%;'></div>";
+            echo "<div class='poll-progress-bg'>";
+            echo "<div class='poll-progress-fill' style='width: {$percent}%;'></div>";
             echo "</div></div>";
         }
-        
-        // --- ADMIN AUDIT: Who voted for what ---
+
         if ($userRole === 'admin') {
-            echo "<details style='margin-top: 15px; font-size: 0.85rem; color: #64748b; background: #f8fafc; padding: 10px; border-radius: 4px;'>";
+            echo "<details class='voter-audit'>";
             echo "<summary style='cursor:pointer; font-weight: bold;'>🕵️ View Voter List</summary>";
-            
+
             $voterStmt = $db->prepare("SELECT u.username, o.option_text FROM poll_votes v JOIN users u ON v.user_id = u.id JOIN poll_options o ON v.option_id = o.id WHERE v.poll_id = ? ORDER BY u.username");
             $voterStmt->execute([$poll['id']]);
             $voters = $voterStmt->fetchAll();
 
             if ($voters) {
                 echo "<ul style='margin: 10px 0 0 0; padding-left: 20px;'>";
-                foreach ($voters as $v) { 
-                    echo "<li><strong>" . htmlspecialchars($v['username']) . "</strong>: " . htmlspecialchars($v['option_text']) . "</li>"; 
+                foreach ($voters as $v) {
+                    echo "<li><strong>" . htmlspecialchars($v['username']) . "</strong>: " . htmlspecialchars($v['option_text']) . "</li>";
                 }
                 echo "</ul>";
             } else {
@@ -119,11 +118,10 @@ foreach ($polls as $poll) {
             echo "</details>";
         }
     } else {
-        // --- VOTING FORM ---
         echo "<form method='POST' action='submit_vote.php'>";
         foreach ($options as $option) {
-            echo "<label style='display: flex; align-items: center; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px; cursor: pointer;'>";
-            echo "<input type='radio' name='option_id' value='{$option['id']}' required style='margin: 0 12px 0 0; width: 18px; height: 18px; flex-shrink: 0;'>";
+            echo "<label class='poll-option-label'>";
+            echo "<input type='radio' name='option_id' value='{$option['id']}' required>";
             echo "<span>" . htmlspecialchars($option['option_text']) . "</span>";
             echo "</label>";
         }
@@ -134,3 +132,15 @@ foreach ($polls as $poll) {
     echo "</div>";
 }
 ?>
+
+<script>
+    window.addEventListener('load', () => {
+        const bars = document.querySelectorAll('.poll-progress-fill');
+        setTimeout(() => {
+            bars.forEach(bar => {
+                const targetWidth = bar.getAttribute('data-percent') + '%';
+                bar.style.width = targetWidth;
+            });
+        }, 100);
+    });
+</script>

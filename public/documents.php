@@ -83,7 +83,7 @@ foreach ($categories as $key => $label) {
             echo "<p style='font-size: 0.85rem; color: #666; margin-bottom: 15px; min-height: 40px;'>" . htmlspecialchars($doc['description'] ?? '') . "</p>";
             
             if (!empty($doc['file_path'])) {
-                $filePath = "uploads/" . htmlspecialchars($doc['file_path']);
+                $filePath = "../uploads/" . htmlspecialchars($doc['file_path']);
                 echo "<a href='$filePath' target='_blank' style='display: block; text-align: center; background: #f0f7ff; padding: 10px; border-radius: 6px; color: #007bff; font-weight: bold; text-decoration: none; border: 1px solid #cce5ff;'>View / Download</a>";
             }
             
