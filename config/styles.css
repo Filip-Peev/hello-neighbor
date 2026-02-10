@@ -1,16 +1,11 @@
 /* --- Professional Color Palette & Variables --- */
 :root {
     --primary: #2563eb;
-    /* Modern Blue */
     --primary-hover: #1d4ed8;
     --success: #059669;
-    /* Emerald Green */
     --danger: #dc2626;
-    /* Soft Red */
     --warning: #f59e0b;
-    /* Amber */
     --bg-body: #f8fafc;
-    /* Slate Gray Background */
     --bg-card: #ffffff;
     --text-main: #1e293b;
     --text-muted: #64748b;
@@ -22,24 +17,32 @@
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     line-height: 1.6;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
+    margin: 0;
+    /* Important: allows nav to hit edges */
+    padding: 0;
     background-color: var(--bg-body);
     color: var(--text-main);
 }
 
-/* --- Navigation --- */
+/* --- Navigation (Full Width) --- */
 nav {
     background: #1e293b;
-    /* Dark Slate */
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    margin-bottom: 30px;
+    padding: 0.75rem 0;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    box-shadow: var(--shadow);
+    width: 100%;
+}
+
+.nav-container {
+    width: 95%;
+    max-width: 1400px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: var(--shadow);
+    flex-wrap: wrap;
+    margin: 0 auto;
 }
 
 nav a,
@@ -62,8 +65,11 @@ nav a:hover {
     gap: 20px;
 }
 
-/* --- Layout Containers --- */
+/* --- Layout Containers (Centered at 900px) --- */
 .container {
+    max-width: 900px;
+    margin: 0 auto 40px;
+    /* Centers the feed and gives bottom space */
     background: var(--bg-card);
     padding: 30px;
     border-radius: 12px;
@@ -71,7 +77,7 @@ nav a:hover {
     box-shadow: var(--shadow);
 }
 
-/* --- Typography & Headers --- */
+/* --- Typography --- */
 h2,
 h3 {
     color: #0f172a;
@@ -81,12 +87,12 @@ h3 {
 
 /* --- Forms & Inputs --- */
 input,
-textarea {
+textarea,
+select {
     margin-bottom: 15px;
     padding: 10px 14px;
     width: 100%;
     box-sizing: border-box;
-    /* Ensures padding doesn't break width */
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
@@ -120,15 +126,6 @@ button:active {
     transform: translateY(1px);
 }
 
-/* Override for the green 'Post' button and logout */
-button[type="submit"] {
-    background: var(--success);
-}
-
-button[type="submit"]:hover {
-    background: #047857;
-}
-
 /* --- The Feed Components --- */
 .feed-container {
     display: flex;
@@ -136,9 +133,8 @@ button[type="submit"]:hover {
     gap: 10px;
 }
 
-/* Date Dividers */
 .date-divider {
-    margin: 10px 0 15px;
+    margin: 20px 0 15px;
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 5px;
 }
@@ -146,38 +142,42 @@ button[type="submit"]:hover {
 .date-divider h4 {
     margin: 0;
     color: var(--text-muted) !important;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    font-weight: 600 !important;
 }
 
 /* Post Cards */
 [id^="post-"] {
-    transition: all 0.1s ease-in-out; /* Added 'all' and timing for smoothness */
+    transition: all 0.2s ease;
 }
 
 [id^="post-"]:hover {
-    /* This now matches the blue border-left color exactly */
-    border-color: var(--primary) !important; 
-    box-shadow: var(--shadow); /* Optional: makes it pop on hover */
+    border-color: var(--primary) !important;
 }
 
-/* --- Profile Grid Fix --- */
-@media (min-width: 601px) {
-    div[style*="display: grid"] {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 20px !important;
-    }
+/* --- Comments --- */
+.comments-container {
+    margin-left: 30px;
+    margin-top: 10px;
+    border-left: 4px solid #cbd5e1;
+    padding: 15px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* --- Responsive Design --- */
-@media (max-width: 800px) {
-    nav {
+.comments-container:hover {
+    background: #e8edf3;
+    border-left-color: #059669;
+}
+
+/* --- Responsive (Mobile) --- */
+@media (max-width: 900px) {
+    .nav-container {
         flex-direction: column;
-        padding: 1.5rem;
         gap: 15px;
+        padding: 10px 0;
     }
 
     .nav-left,
@@ -187,101 +187,34 @@ button[type="submit"]:hover {
         gap: 15px;
     }
 
+    .container {
+        margin: 10px;
+        padding: 20px;
+    }
+
+    nav {
+        margin-top: 0;
+        border-radius: 0;
+    }
+
+    /* Hide welcome text on mobile to save space */
     .nav-right span {
         display: none;
     }
+}
 
-    div[style*="display: grid"] {
-        grid-template-columns: 1fr !important;
+/* Profile Grid Fix */
+@media (min-width: 601px) {
+    .profile-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 20px !important;
     }
 }
 
-/* --- Utilities --- */
-hr {
-    border: 0;
-    border-top: 1px solid var(--border-color);
-}
-
-textarea {
-    font-family: inherit;
-    resize: vertical;
-    min-height: 100px;
-}
-
-/* Styling for the comment remove button to match post delete button */
-.btn-remove-comment {
-    background: #dc3545 !important;
-    color: white;
-    padding: 5px 10px;
-    font-size: 0.7rem;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.btn-remove-comment:hover {
-    background: #c82333 !important;
-}
-
-/* Darker, more defined styling for the comment block area */
-.comments-container {
-    margin-left: 30px;
-    margin-top: 10px;
-    border-left: 4px solid #cbd5e1; /* Darker, thicker grey border */
-    padding: 15px;
-    background: #f1f5f9;         /* Darker blue-grey background */
-    border-radius: 8px;
-    
-    /* Stronger Inner Shadow for depth */
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); 
-    
-    transition: all 0.3s ease;
-}
-
-/* Hover Effect - More intense */
-.comments-container:hover {
-    background: #e2e8f0;         /* Even darker on hover */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Stronger outer shadow when active */
-    border-left-color: #059669;  /* Darker emerald green border */
-}
-
-.date-filter-input {
-    transition: border-color 0.2s, box-shadow 0.2s;
-    font-family: inherit;
-    outline: none;
-    margin-bottom: 0px;
-}
-
-.date-filter-input:hover {
+.card-poll:hover {
     border-color: var(--primary) !important;
+    box-shadow: var(--shadow);
 }
 
-/* Optional: Targets the calendar icon specifically in some browsers */
-.date-filter-input::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    border-radius: 4px;
-    padding: 2px;
-}
-
-.filter-container a:hover {
-    border-color: var(--primary) !important;
-    color: var(--primary) !important;
-    background-color: #f8fafc;
-}
-
-.date-filter-input {
-    font-weight: 600;
-    color: var(--text-main);
-}
-
-.add-post-container textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.date-filter-input:focus {
-    border-color: var(--primary);
-    outline: none;
-}
+#post-73>div:nth-child(3)>div:nth-child(1)

@@ -56,14 +56,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 );
 
                 CREATE TABLE IF NOT EXISTS comments (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                post_id INT NOT NULL,
-                user_id INT NOT NULL,
-                content TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT fk_comment_post FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-                CONSTRAINT fk_comment_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-            );";
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    post_id INT NOT NULL,
+                    user_id INT NOT NULL,
+                    content TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    CONSTRAINT fk_comment_post FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+                    CONSTRAINT fk_comment_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+
+                CREATE TABLE IF NOT EXISTS polls (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    question TEXT NOT NULL,
+                    category ENUM('public', 'private') DEFAULT 'public',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+
+                CREATE TABLE IF NOT EXISTS poll_options (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    poll_id INT NOT NULL,
+                    option_text VARCHAR(255) NOT NULL,
+                    FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE
+                );
+
+                CREATE TABLE IF NOT EXISTS poll_votes (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    poll_id INT NOT NULL,
+                    option_id INT NOT NULL,
+                    user_id INT NOT NULL,
+                    FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
+                    FOREIGN KEY (option_id) REFERENCES poll_options(id) ON DELETE CASCADE,
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                    UNIQUE KEY (poll_id, user_id)
+                );
+                
+                CREATE TABLE IF NOT EXISTS documents (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    title VARCHAR(255) NOT NULL,
+                    description TEXT NULL,
+                    
+                    file_path VARCHAR(255) DEFAULT NULL,
+                    
+                    external_url VARCHAR(255) DEFAULT NULL,
+                    
+                    category ENUM('legal', 'maintenance', 'financial', 'general') DEFAULT 'general',
+                    
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
             $pdo->exec($sql);
 
@@ -87,6 +127,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // 4. Create .env file
             $envContent = "DB_HOST=\"$host\"\nDB_PORT=\"$port\"\nDB_NAME=\"$dbName\"\nDB_USER=\"$user\"\nMARIADB_PASS=\"$pass\"";
             file_put_contents($envPath, $envContent);
+
+            // 5. Lock installer by renaming it
+            $installerPath = __FILE__;
+            $lockedPath = __DIR__ . '/install.php.locked';
+
+            if (!rename($installerPath, $lockedPath)) {
+                throw new Exception("Installation completed, but failed to lock the installer file.");
+            }
 
             $message = "✅ Installation successful! You can now <a href='index.php?page=login'>Login</a>.";
             $status = "success";

@@ -231,41 +231,45 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
                     <?php endif; ?>
                 </div>
 
-                <div class="comments-container">
-                    <?php
-                    // Fetch comments for this specific post
-                    $stmtComm = $db->prepare("SELECT comments.*, users.username FROM comments 
-                             JOIN users ON comments.user_id = users.id 
-                             WHERE post_id = ? ORDER BY created_at ASC");
-                    $stmtComm->execute([$post['id']]);
-                    $comments = $stmtComm->fetchAll();
+                <?php
+                // Fetch comments for this specific post
+                $stmtComm = $db->prepare("SELECT comments.*, users.username FROM comments 
+     JOIN users ON comments.user_id = users.id 
+     WHERE post_id = ? ORDER BY created_at ASC");
+                $stmtComm->execute([$post['id']]);
+                $comments = $stmtComm->fetchAll();
 
-                    foreach ($comments as $comment): ?>
-                        <div style="font-size: 0.9rem; margin-bottom: 8px; position: relative; padding-right: 60px;">
-                            <strong><?php echo htmlspecialchars($comment['username']); ?>:</strong>
-                            <?php echo htmlspecialchars($comment['content']); ?>
-                            <small style="color: #999; display: block;"><?php echo date('M j, g:i a', strtotime($comment['created_at'])); ?></small>
+                // Only show the container if there are comments OR the user can post a new one
+                if (!empty($comments) || $userId):
+                ?>
+                    <div class="comments-container" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+                        <?php foreach ($comments as $comment): ?>
+                            <div style="font-size: 0.9rem; margin-bottom: 8px; position: relative; padding-right: 60px;">
+                                <strong><?php echo htmlspecialchars($comment['username']); ?>:</strong>
+                                <?php echo htmlspecialchars($comment['content']); ?>
+                                <small style="color: #999; display: block;"><?php echo date('M j, g:i a', strtotime($comment['created_at'])); ?></small>
 
-                            <?php if ($userId && ($comment['user_id'] == $userId || $userRole === 'admin')): ?>
-                                <form method="POST" action="delete_comment.php" onsubmit="return confirm('Delete this comment?');" style="position: absolute; right: 0; top: 0;">
-                                    <input type="hidden" name="comment_id" value="<?php echo $comment['id']; ?>">
-                                    <input type="hidden" name="return_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
-                                    <button type="submit" class="btn-remove-comment"><?php echo $lang['btn_remove']; ?></button>
-                                </form>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
+                                <?php if ($userId && ($comment['user_id'] == $userId || $userRole === 'admin')): ?>
+                                    <form method="POST" action="delete_comment.php" onsubmit="return confirm('Delete this comment?');" style="position: absolute; right: 0; top: 0;">
+                                        <input type="hidden" name="comment_id" value="<?php echo $comment['id']; ?>">
+                                        <input type="hidden" name="return_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
+                                        <button type="submit" class="btn-remove-comment"><?php echo $lang['btn_remove']; ?></button>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
 
-                    <?php if ($userId): ?>
-                        <form method="POST" action="add_comment.php" style="margin-top: 10px;">
-                            <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
-                            <input type="hidden" name="return_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
-                            <input type="text" name="comment_content" placeholder="Write an answer..." required
-                                style="width: 80%; padding: 5px; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
-                            <button type="submit" style="padding: 4px 10px; font-size: 0.8rem;"><?php echo $lang['btn_reply']; ?></button>
-                        </form>
-                    <?php endif; ?>
-                </div>
+                        <?php if ($userId): ?>
+                            <form method="POST" action="add_comment.php" style="margin-top: 10px;">
+                                <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+                                <input type="hidden" name="return_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
+                                <input type="text" name="comment_content" placeholder="Add a comment..." required
+                                    style="width: 80%; padding: 5px; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                                <button type="submit" style="padding: 4px 10px; font-size: 0.8rem;"><?php echo $lang['btn_reply']; ?></button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
 
                 <div id="edit-mode-<?php echo $post['id']; ?>" style="display: none;">
                     <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?><?php echo $selectedDate ? '&date=' . urlencode($selectedDate) : ''; ?>">
