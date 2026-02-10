@@ -24,8 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
         $deleteStmt = $db->prepare("UPDATE users SET is_deleted = 1 WHERE id = ?");
         $deleteStmt->execute([$userId]);
 
-        session_destroy();                     // end the current PHP session
-        header("Location: index.php?page=home&msg=deleted");
+        session_destroy();
+        header("Location: index.php?page=feed&msg=deleted");
         exit;
     } else {
         $msg = "<p style='color: red;'>❌ Incorrect password. Account not deleted.</p>";

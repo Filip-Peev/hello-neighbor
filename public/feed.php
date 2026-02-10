@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $returnPage = isset($_POST['return_page']) ? (int)$_POST['return_page'] : 1;
+    $dateQuery = $selectedDate ? "&date=" . urlencode($selectedDate) : "";
 
     // A. Handle Delete Request
     if (isset($_POST['delete_post_id'])) {
@@ -34,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $db->prepare("DELETE FROM posts WHERE id = ? AND user_id = ?");
             $stmt->execute([$postId, $userId]);
         }
-        header("Location: index.php?page=feed&tab=$currentTab&p=$returnPage&msg=deleted");
+        header("Location: index.php?page=feed&tab=$currentTab&p=$returnPage$dateQuery&msg=deleted");
         exit;
     }
 
@@ -51,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$newContent, $postId, $userId]);
             }
         }
-        header("Location: index.php?page=feed&tab=$currentTab&p=$returnPage&msg=updated");
+        header("Location: index.php?page=feed&tab=$currentTab&p=$returnPage$dateQuery&msg=updated");
         exit;
     }
 
@@ -123,7 +124,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 
 <div class="container" style="margin-bottom: 30px; background: #fff;">
     <?php if ($userId): ?>
-        <form method="POST" action="index.php?page=feed&tab=<?php echo htmlspecialchars($currentTab); ?>">
+        <form method="POST" action="index.php?page=feed&tab=<?php echo htmlspecialchars($currentTab); ?><?php echo $selectedDate ? '&date='.urlencode($selectedDate) : ''; ?>">
             <label><strong>Post to <?php echo htmlspecialchars($displayTitle); ?>:</strong></label><br>
             <textarea name="post_content" placeholder="Share something with the community..." required
                 style="width: 100%; height: 80px; padding: 10px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; font-family: sans-serif; resize: vertical;"></textarea><br>
@@ -141,17 +142,13 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
     <form id="dateFilterForm" method="GET" action="index.php" style="display: flex; align-items: center; gap: 10px; margin: 0;">
         <input type="hidden" name="page" value="feed">
         <input type="hidden" name="tab" value="<?php echo htmlspecialchars($currentTab); ?>">
-        
+
         <label for="filter_date"><strong>Jump to Date:</strong></label>
-        <input type="date" id="filter_date" name="date" 
-               value="<?php echo htmlspecialchars($selectedDate ?? ''); ?>" 
-               onchange="document.getElementById('dateFilterForm').submit();"
-               style="padding: 5px; border-radius: 4px; border: 1px solid #ccc; width: auto; margin-bottom: 0; cursor: pointer;">
-        
-        <noscript>
-            <button type="submit" style="padding: 5px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Go</button>
-        </noscript>
-        
+        <input type="date" id="filter_date" name="date"
+            value="<?php echo htmlspecialchars($selectedDate ?? ''); ?>"
+            onchange="document.getElementById('dateFilterForm').submit();"
+            style="padding: 5px; border-radius: 4px; border: 1px solid #ccc; width: auto; margin-bottom: 0; cursor: pointer;">
+
         <?php if ($selectedDate): ?>
             <a href="index.php?page=feed&tab=<?php echo $currentTab; ?>" style="font-size: 0.8rem; color: #dc3545; text-decoration: none; font-weight: bold;">✕ Clear Filter</a>
         <?php endif; ?>
@@ -162,21 +159,18 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
     <?php if (empty($posts)): ?>
         <p>No notices found in the <?php echo htmlspecialchars($displayTitle); ?> section.</p>
     <?php else: ?>
-        <?php 
-        $currentDateHeader = ''; 
-        foreach ($posts as $post): 
+        <?php
+        $currentDateHeader = '';
+        foreach ($posts as $post):
             $postDate = date('F j, Y', strtotime($post['created_at']));
-            
-            // Show Date Header if the date changes
+
             if ($postDate !== $currentDateHeader):
                 $currentDateHeader = $postDate;
         ?>
-            <div class="date-divider" style="margin: 10px 0 15px; border-bottom: 2px solid #eee; padding-bottom: 5px;">
-                <h4 style="margin: 0; color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
-                    📅 <?php echo $postDate; ?>
-                </h4>
-            </div>
-        <?php endif; ?>
+                <div class="date-divider">
+                    <h4>📅 <?php echo $postDate; ?></h4>
+                </div>
+            <?php endif; ?>
 
             <div id="post-<?php echo $post['id']; ?>" style="background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; border-left: 5px solid <?php echo ($post['author_role'] === 'admin') ? '#007bff' : '#28a745'; ?>; position: relative;">
 
@@ -192,7 +186,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
                         <div style="display: flex; gap: 8px; margin-top: 10px;">
                             <button onclick="toggleEdit(<?php echo $post['id']; ?>)" style="background: #ffc107; color: #000; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer;">Edit</button>
 
-                            <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?>" onsubmit="return confirm('Delete this post?');">
+                            <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?><?php echo $selectedDate ? '&date='.urlencode($selectedDate) : ''; ?>" onsubmit="return confirm('Delete this post?');">
                                 <input type="hidden" name="delete_post_id" value="<?php echo $post['id']; ?>">
                                 <input type="hidden" name="return_page" value="<?php echo $pageNumber; ?>">
                                 <button type="submit" style="background: #dc3545; color: white; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer;">Delete</button>
@@ -202,7 +196,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
                 </div>
 
                 <div id="edit-mode-<?php echo $post['id']; ?>" style="display: none;">
-                    <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?>">
+                    <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?><?php echo $selectedDate ? '&date='.urlencode($selectedDate) : ''; ?>">
                         <input type="hidden" name="update_post_id" value="<?php echo $post['id']; ?>">
                         <input type="hidden" name="return_page" value="<?php echo $pageNumber; ?>">
                         <textarea name="edit_content" style="width: 100%; height: 70px; padding: 8px; margin-bottom: 8px; border: 1px solid #ccc; font-family: sans-serif;"><?php echo htmlspecialchars($post['content']); ?></textarea><br>

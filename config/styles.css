@@ -1,11 +1,16 @@
 /* --- Professional Color Palette & Variables --- */
 :root {
-    --primary: #2563eb;        /* Modern Blue */
+    --primary: #2563eb;
+    /* Modern Blue */
     --primary-hover: #1d4ed8;
-    --success: #059669;        /* Emerald Green */
-    --danger: #dc2626;         /* Soft Red */
-    --warning: #f59e0b;        /* Amber */
-    --bg-body: #f8fafc;        /* Slate Gray Background */
+    --success: #059669;
+    /* Emerald Green */
+    --danger: #dc2626;
+    /* Soft Red */
+    --warning: #f59e0b;
+    /* Amber */
+    --bg-body: #f8fafc;
+    /* Slate Gray Background */
     --bg-card: #ffffff;
     --text-main: #1e293b;
     --text-muted: #64748b;
@@ -26,7 +31,8 @@ body {
 
 /* --- Navigation --- */
 nav {
-    background: #1e293b; /* Dark Slate */
+    background: #1e293b;
+    /* Dark Slate */
     padding: 0.75rem 1.5rem;
     border-radius: 12px;
     margin-bottom: 30px;
@@ -36,7 +42,8 @@ nav {
     box-shadow: var(--shadow);
 }
 
-nav a, nav span {
+nav a,
+nav span {
     color: #f8fafc;
     text-decoration: none;
     font-weight: 500;
@@ -48,7 +55,8 @@ nav a:hover {
     color: #93c5fd;
 }
 
-.nav-left, .nav-right {
+.nav-left,
+.nav-right {
     display: flex;
     align-items: center;
     gap: 20px;
@@ -64,25 +72,29 @@ nav a:hover {
 }
 
 /* --- Typography & Headers --- */
-h2, h3 {
+h2,
+h3 {
     color: #0f172a;
     font-weight: 700;
     margin-top: 0;
 }
 
 /* --- Forms & Inputs --- */
-input, textarea {
+input,
+textarea {
     margin-bottom: 15px;
     padding: 10px 14px;
     width: 100%;
-    box-sizing: border-box; /* Ensures padding doesn't break width */
+    box-sizing: border-box;
+    /* Ensures padding doesn't break width */
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-input:focus, textarea:focus {
+input:focus,
+textarea:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
@@ -109,8 +121,13 @@ button:active {
 }
 
 /* Override for the green 'Post' button and logout */
-button[type="submit"] { background: var(--success); }
-button[type="submit"]:hover { background: #047857; }
+button[type="submit"] {
+    background: var(--success);
+}
+
+button[type="submit"]:hover {
+    background: #047857;
+}
 
 /* --- The Feed Components --- */
 .feed-container {
@@ -120,18 +137,30 @@ button[type="submit"]:hover { background: #047857; }
 }
 
 /* Date Dividers */
+.date-divider {
+    margin: 10px 0 15px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 5px;
+}
+
 .date-divider h4 {
+    margin: 0;
     color: var(--text-muted) !important;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     font-weight: 600 !important;
 }
 
 /* Post Cards */
 [id^="post-"] {
-    transition: transform 0.2s;
+    transition: all 0.1s ease-in-out; /* Added 'all' and timing for smoothness */
 }
 
 [id^="post-"]:hover {
-    border-color: #cbd5e1 !important;
+    /* This now matches the blue border-left color exactly */
+    border-color: var(--primary) !important; 
+    box-shadow: var(--shadow); /* Optional: makes it pop on hover */
 }
 
 /* --- Profile Grid Fix --- */
@@ -151,7 +180,8 @@ button[type="submit"]:hover { background: #047857; }
         gap: 15px;
     }
 
-    .nav-left, .nav-right {
+    .nav-left,
+    .nav-right {
         width: 100%;
         justify-content: center;
         gap: 15px;
@@ -160,7 +190,7 @@ button[type="submit"]:hover { background: #047857; }
     .nav-right span {
         display: none;
     }
-    
+
     div[style*="display: grid"] {
         grid-template-columns: 1fr !important;
     }

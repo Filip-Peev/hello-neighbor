@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $loginSuccess = true;
                 echo "<p style='color: green; font-weight: bold;'>✅ Login successful! Welcome back, " . htmlspecialchars($user['username']) . ".</p>";
                 echo "<p>Redirecting you to the home page...</p>";
-                echo "<script>setTimeout(() => { window.location.href = 'index.php?page=home'; }, 2000);</script>";
+                echo "<script>setTimeout(() => { window.location.href = 'index.php?page=feed'; }, 2000);</script>";
             } else {
                 echo "<p style='color: red;'>❌ Invalid username or password.</p>";
             }
