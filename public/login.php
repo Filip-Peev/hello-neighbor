@@ -1,6 +1,8 @@
 <?php
 // public/login.php
 
+$loginSuccess = false; // Track if login was successful to control the UI
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userOrEmail = trim($_POST['identifier'] ?? '');
     $pass = $_POST['password'] ?? '';
@@ -23,7 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $updateStmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
                 $updateStmt->execute([$user['id']]);
 
-                echo "<p style='color: green;'>✅ Login successful! Welcome back, " . htmlspecialchars($user['username']) . ".</p>";
+                $loginSuccess = true;
+                echo "<p style='color: green; font-weight: bold;'>✅ Login successful! Welcome back, " . htmlspecialchars($user['username']) . ".</p>";
+                echo "<p>Redirecting you to the home page...</p>";
                 echo "<script>setTimeout(() => { window.location.href = 'index.php?page=home'; }, 2000);</script>";
             } else {
                 echo "<p style='color: red;'>❌ Invalid username or password.</p>";
@@ -35,9 +39,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<h3>Login to Your Account</h3>
-<form method="POST" action="index.php?page=login">
-    <input type="text" name="identifier" placeholder="Username or Email" required><br>
-    <input type="password" name="password" placeholder="Password" required><br>
-    <button type="submit" style="background: #007bff;">Login</button>
-</form>
+<?php if (!$loginSuccess): ?>
+    <h3>Login to Your Account</h3>
+    <form id="loginForm" method="POST" action="index.php?page=login">
+        <input type="text" name="identifier" placeholder="Username or Email" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        <button type="submit" id="loginBtn">Login</button>
+    </form>
+<?php endif; ?>
+
+<script>
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.onsubmit = function() {
+            const btn = document.getElementById('loginBtn');
+            setTimeout(() => {
+                btn.disabled = true;
+                btn.innerText = 'Verifying...';
+                btn.style.opacity = '0.7';
+                btn.style.cursor = 'not-allowed';
+            }, 10);
+        };
+    }
+</script>
