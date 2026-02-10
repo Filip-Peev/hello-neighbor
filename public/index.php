@@ -20,11 +20,13 @@ $page = $_GET['page'] ?? 'home';
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Hello Neighbor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../config/styles.css">
 </head>
+
 <body>
 
     <nav>
@@ -32,6 +34,7 @@ $page = $_GET['page'] ?? 'home';
             <a href="index.php?page=home">Home</a>
             <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="index.php?page=dashboard">Dashboard</a>
+                <a href="index.php?page=feed">Notice Board</a>
                 <a href="index.php?page=profile">Profile</a>
             <?php endif; ?>
         </div>
@@ -59,6 +62,9 @@ $page = $_GET['page'] ?? 'home';
             case 'profile':
                 include 'profile.php';
                 break;
+            case 'feed':
+                include 'feed.php';
+                break;
             case 'dashboard':
                 if (!isset($_SESSION['user_id'])) {
                     echo "<h2>🚫 Access Denied</h2><p>You must <a href='index.php?page=login'>Login</a> to see this page.</p>";
@@ -80,4 +86,5 @@ $page = $_GET['page'] ?? 'home';
     </div>
 
 </body>
+
 </html>

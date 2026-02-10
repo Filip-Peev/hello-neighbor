@@ -37,17 +37,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // 1. Create Database and Table
             $sql = "CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-                    USE `$dbName`;
-                    CREATE TABLE IF NOT EXISTS users (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        username VARCHAR(100) NOT NULL UNIQUE,
-                        email VARCHAR(255) NOT NULL UNIQUE,
-                        password_hash VARCHAR(255) NOT NULL,
-                        role ENUM('user', 'admin', 'moderator') DEFAULT 'user', 
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        last_login TIMESTAMP NULL DEFAULT NULL,
-                        is_deleted TINYINT(1) DEFAULT 0
-                    ) ENGINE=InnoDB;";
+        USE `$dbName`;
+        
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(100) NOT NULL UNIQUE,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            password_hash VARCHAR(255) NOT NULL,
+            role ENUM('user', 'admin', 'moderator') DEFAULT 'user', 
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            last_login TIMESTAMP NULL DEFAULT NULL,
+            is_deleted TINYINT(1) DEFAULT 0
+        ) ENGINE=InnoDB;
+
+        CREATE TABLE IF NOT EXISTS posts (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            content TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB;";
             $pdo->exec($sql);
 
             // 2. Create the Admin User

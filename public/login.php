@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // 3. Start a session and "log them in"
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = $user['role'];
 
                 // 4. Update the last_login timestamp
                 $updateStmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");

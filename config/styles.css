@@ -69,3 +69,13 @@ button {
         display: none;
     }
 }
+
+textarea {
+    font-family: sans-serif;
+    resize: vertical;
+}
+
+.feed {
+    display: flex;
+    flex-direction: column;
+}
