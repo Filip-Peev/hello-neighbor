@@ -102,8 +102,8 @@ $stmtCount->execute($params);
 $totalPosts = $stmtCount->fetchColumn();
 $totalPages = ceil($totalPosts / $postsPerPage);
 
-// Fetch posts
-$stmt = $db->prepare("SELECT posts.*, users.username, users.role as author_role 
+// UPDATED QUERY: Fetch users.summary along with the post data
+$stmt = $db->prepare("SELECT posts.*, users.username, users.role as author_role, users.summary 
                       FROM posts 
                       JOIN users ON posts.user_id = users.id 
                       $whereClause 
@@ -236,9 +236,16 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 
             <div id="post-<?php echo $post['id']; ?>" style="background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; border-left: 5px solid <?php echo ($post['author_role'] === 'admin') ? '#007bff' : '#28a745'; ?>; position: relative;">
 
-                <div style="margin-bottom: 8px;">
+                <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 10px;">
                     <strong style="color: #333;"><?php echo htmlspecialchars($post['username']); ?></strong>
-                    <small style="color: #888; margin-left: 10px;"><?php echo date('g:i a', strtotime($post['created_at'])); ?></small>
+
+                    <?php if (!empty($post['summary'])): ?>
+                        <span class="neighbor-badge" title="Neighbor Summary">
+                            <?php echo htmlspecialchars($post['summary']); ?>
+                        </span>
+                    <?php endif; ?>
+
+                    <small style="color: #888; margin-left: auto;"><?php echo date('g:i a', strtotime($post['created_at'])); ?></small>
                 </div>
 
                 <div id="view-mode-<?php echo $post['id']; ?>">
@@ -246,14 +253,12 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 
                     <?php if ($userId && ($post['user_id'] == $userId || $userRole === 'admin')): ?>
                         <div style="display: flex; gap: 8px; margin-top: 10px;">
-                            <button onclick="toggleEdit(<?php echo $post['id']; ?>)" class="edit-button">
-                                Edit
-                            </button>
+                            <button onclick="toggleEdit(<?php echo $post['id']; ?>)" style="background: #ffc107; color: #000; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer;">Edit</button>
 
                             <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?><?php echo $selectedDate ? '&date=' . urlencode($selectedDate) : ''; ?>" onsubmit="return confirm('Delete this post?');">
                                 <input type="hidden" name="delete_post_id" value="<?php echo $post['id']; ?>">
                                 <input type="hidden" name="return_page" value="<?php echo $pageNumber; ?>">
-                                <button type="submit" class="delete-button">Delete</button>
+                                <button type="submit" style="background: #dc3545; color: white; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer;">Delete</button>
                             </form>
                         </div>
                     <?php endif; ?>
