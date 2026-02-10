@@ -13,8 +13,9 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 .env
-Start VSCode.vbs
 .htaccess
+Start VSCode.vbs
+/Uploads/*
 
 # Mono auto generated files
 mono_crash.*
