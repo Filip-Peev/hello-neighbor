@@ -1,4 +1,5 @@
 <?php
+ob_start();
 session_start();
 
 $supported_langs = ['en', 'bg'];
@@ -195,3 +196,6 @@ function showAccessDenied($title, $reason)
 </body>
 
 </html>
+<?php
+ob_end_flush();
+?>

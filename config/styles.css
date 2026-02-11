@@ -265,6 +265,7 @@ button:active {
 
 .card-poll {
     position: relative;
+    margin-top: 25px;
     margin-bottom: 25px;
     padding: 25px;
     border: 1px solid var(--border-color);
