@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     CONSTRAINT fk_comment_post FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
                     CONSTRAINT fk_comment_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-            );
+                );
 
                 CREATE TABLE IF NOT EXISTS polls (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -95,16 +95,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     title VARCHAR(255) NOT NULL,
                     description TEXT NULL,
-                    
                     file_path VARCHAR(255) DEFAULT NULL,
-                    
                     external_url VARCHAR(255) DEFAULT NULL,
-                    
                     category ENUM('legal', 'maintenance', 'financial', 'general') DEFAULT 'general',
-                    
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+                );
+
+                -- NEW: Direct Messaging Tables
+                CREATE TABLE IF NOT EXISTS conversations (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    user_one INT NOT NULL,
+                    user_two INT NOT NULL,
+                    last_message_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_one) REFERENCES users(id) ON DELETE CASCADE,
+                    FOREIGN KEY (user_two) REFERENCES users(id) ON DELETE CASCADE,
+                    UNIQUE KEY (user_one, user_two)
+                );
+
+                CREATE TABLE IF NOT EXISTS messages (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    conversation_id INT NOT NULL,
+                    sender_id INT NOT NULL,
+                    message_text TEXT NOT NULL,
+                    is_read TINYINT(1) DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
+                    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+                );";
 
             $pdo->exec($sql);
 
@@ -202,7 +220,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>&copy; <?php echo date('Y'); ?> Hello Neighbor - <em>Unofficial Learning Web App</em></p>
         <a href="mailto:filip@filip-peev.com" style="color: #007bff; text-decoration: none; font-weight: bold;">Feedback</a>
     </footer>
-
 </body>
 
 </html>
