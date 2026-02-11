@@ -5,9 +5,7 @@ $db = Database::getConnection();
 $searchTerm = trim($_GET['search'] ?? '');
 
 // 1. Build the Query
-$sql = "SELECT username, summary, role, created_at 
-        FROM users 
-        WHERE is_deleted = 0";
+$sql = "SELECT id, username, summary, role, created_at FROM users WHERE is_deleted = 0";
 
 if (!empty($searchTerm)) {
     $sql .= " AND (username LIKE ? OR summary LIKE ?)";
@@ -76,6 +74,16 @@ $neighbors = $stmt->fetchAll();
                         </small>
                     </div>
                 </div>
+
+                <?php if (isset($_SESSION['user_id']) && $neighbor['id'] != $_SESSION['user_id']): ?>
+                    <div style="margin-top: 15px;">
+                        <a href="index.php?page=messages&with_user=<?php echo $neighbor['id']; ?>"
+                            class="primary-button"
+                            style="text-decoration: none; font-size: 0.8rem; display: inline-block;">
+                            💬 Message
+                        </a>
+                    </div>
+                <?php endif; ?>
 
                 <div class="neighbor-summary-box">
                     <?php if (!empty($neighbor['summary'])): ?>

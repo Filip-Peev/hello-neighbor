@@ -26,6 +26,19 @@ try {
     die("Application Error: " . $e->getMessage());
 }
 
+$unreadCount = 0;
+if (isset($_SESSION['user_id'])) {
+    $unreadStmt = $db->prepare("
+        SELECT COUNT(*) FROM messages m
+        JOIN conversations c ON m.conversation_id = c.id
+        WHERE m.sender_id != ? 
+        AND m.is_read = 0 
+        AND (c.user_one = ? OR c.user_two = ?)
+    ");
+    $unreadStmt->execute([$_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id']]);
+    $unreadCount = $unreadStmt->fetchColumn();
+}
+
 $page = $_GET['page'] ?? 'feed';
 $tab = $_GET['tab'] ?? 'public';
 
@@ -86,11 +99,20 @@ function showAccessDenied($title, $reason)
             <div class="nav-right">
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="index.php?page=profile" style="<?php echo $page === 'profile' ? 'text-decoration: underline;' : ''; ?>">
-                        <?php echo $lang['nav_profile']; ?>
+
+                        <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong>
+
                     </a>
 
-                    <span style="color: #aaa;">| Welcome, <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong></span>
+                    <a href="index.php?page=messages" class="<?= ($page === 'messages') ? 'active' : '' ?>">Messages<?php if ($unreadCount > 0): ?>
+                        <span style="background: var(--danger); color: white; padding: 2px 6px; border-radius: 50%; font-size: 0.7rem; margin-left: 5px;">
+                            <?= $unreadCount ?>
+                        </span>
+                    <?php endif; ?>
+                    </a>
+
                     <a href="logout.php" style="color: #ff6666;"><?php echo $lang['nav_logout']; ?></a>
+
                 <?php else: ?>
                     <a href="index.php?page=register" style="<?php echo $page === 'register' ? 'text-decoration: underline;' : ''; ?>">
                         <?php echo $lang['nav_register']; ?>
@@ -142,6 +164,14 @@ function showAccessDenied($title, $reason)
                 }
                 break;
 
+            case 'messages':
+                if (!isset($_SESSION['user_id'])) {
+                    showAccessDenied("Messages", "your conversations");
+                } else {
+                    include 'messages.php';
+                }
+                break;
+
             case 'feed':
             default:
                 $protectedTabs = ['private', 'other'];
@@ -164,11 +194,10 @@ function showAccessDenied($title, $reason)
                 const length = this.value.length;
                 charCount.textContent = length;
 
-                // Optional: Change color to red when near the limit
                 if (length >= 450) {
-                    charCount.style.color = '#dc3545'; // Red
+                    charCount.style.color = '#dc3545';
                 } else {
-                    charCount.style.color = '#888'; // Grey
+                    charCount.style.color = '#888';
                 }
             });
         }
@@ -183,8 +212,8 @@ function showAccessDenied($title, $reason)
 
         <?php
         // Flag to control the visibility of the language switcher
-        $not_fully_implemented_yet = true;
-        if (!$not_fully_implemented_yet): ?>
+        $fully_implemented_yet = false;
+        if ($fully_implemented_yet): ?>
             <div class="lang-switcher" style="display: inline-block; font-weight: bold;">
                 <a href="?lang=en" style="color: <?php echo $lang_code === 'en' ? 'var(--primary)' : '#aaa'; ?>;">EN</a> |
                 <a href="?lang=bg" style="color: <?php echo $lang_code === 'bg' ? 'var(--primary)' : '#aaa'; ?>;">BG</a>

@@ -125,7 +125,7 @@ foreach ($polls as $poll) {
             echo "</label>";
         }
         echo "<input type='hidden' name='poll_id' value='{$poll['id']}'>";
-        echo "<button type='submit' style='width: 100%; margin-top: 10px; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;'>Vote</button>";
+        echo "<button type='submit' class=primary-button>Vote</button>";
         echo "</form>";
     }
     echo "</div>";
