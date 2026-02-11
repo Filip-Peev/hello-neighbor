@@ -210,6 +210,10 @@ $userData = $stmt->fetch();
 <div class="danger-card">
     <h3 class="danger-title">Danger Zone</h3>
 
+    <p class="card-description">
+        Deleting your account is permanent. This will mark your account as inactive, and you will no longer be able to log in. Your public profile will be hidden from the neighbor directory, but your existing posts and comments will remain to keep the conversation history intact.
+    </p>
+
     <form
         method="POST"
         action="index.php?page=profile"
