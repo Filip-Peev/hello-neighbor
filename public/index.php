@@ -75,6 +75,7 @@ function showAccessDenied($title, $reason)
                     <span class="logo-text">Hello Neighbor</span>
                 </a>
 
+                <a href="index.php?page=events" class="<?= ($page === 'events') ? 'active' : '' ?>">Events</a>
 
                 <a href="index.php?page=feed&tab=public" style="<?php echo ($page === 'feed' && $tab === 'public') ? 'text-decoration: underline;' : ''; ?>">
                     <?php echo $lang['nav_public']; ?>
@@ -134,6 +135,10 @@ function showAccessDenied($title, $reason)
                 } else {
                     include 'directory.php';
                 }
+                break;
+
+            case 'events':
+                include 'events.php';
                 break;
 
             case 'polls':
