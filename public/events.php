@@ -66,7 +66,11 @@ if (isset($_GET['rsvp_event_id'])) {
 $stmt = $db->prepare("
     SELECT e.*, u.username,
         (SELECT COUNT(*) FROM event_rsvps WHERE event_id = e.id) as rsvp_count,
-        (SELECT COUNT(*) FROM event_rsvps WHERE event_id = e.id AND user_id = ?) as is_my_rsvp
+        (SELECT COUNT(*) FROM event_rsvps WHERE event_id = e.id AND user_id = ?) as is_my_rsvp,
+        (SELECT GROUP_CONCAT(users.username SEPARATOR ', ') 
+         FROM event_rsvps 
+         JOIN users ON event_rsvps.user_id = users.id 
+         WHERE event_rsvps.event_id = e.id) as attendee_names
     FROM events e 
     JOIN users u ON e.created_by = u.id 
     WHERE e.event_date >= CURDATE() 
@@ -124,6 +128,15 @@ $events = $stmt->fetchAll();
                         <div style="font-size: 0.85rem; color: var(--text-muted);">
                             <strong>👥 <?= $event['rsvp_count'] ?> Neighbors Going</strong>
                         </div>
+
+                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                            <div style="margin-top: 10px; padding: 8px; background: #f0f7ff; border-radius: 4px; border: 1px dashed #bcdbff;">
+                                <strong style="font-size: 0.75rem; color: #004085; display: block; margin-bottom: 2px;">Who's Going:</strong>
+                                <p style="font-size: 0.8rem; color: #004085; margin: 0;">
+                                    <?= $event['attendee_names'] ? htmlspecialchars($event['attendee_names']) : 'No one yet' ?>
+                                </p>
+                            </div>
+                        <?php endif; ?>
 
                         <button
                             onclick="handleRSVP(this, '<?= $event['id'] ?>')"
