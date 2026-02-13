@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_event'])) {
     }
 }
 
-// Handle RSVP toggle
+// 3. Handle RSVP toggle
 if (isset($_GET['rsvp_event_id'])) {
     $eventId = (int)$_GET['rsvp_event_id'];
 
@@ -62,15 +62,17 @@ if (isset($_GET['rsvp_event_id'])) {
     exit;
 }
 
-// 3. Fetch Upcoming Events (Sorted by date)
+// 4. Fetch Upcoming Events (Sorted by date)
 $stmt = $db->prepare("
-    SELECT e.*, u.username 
+    SELECT e.*, u.username,
+        (SELECT COUNT(*) FROM event_rsvps WHERE event_id = e.id) as rsvp_count,
+        (SELECT COUNT(*) FROM event_rsvps WHERE event_id = e.id AND user_id = ?) as is_my_rsvp
     FROM events e 
     JOIN users u ON e.created_by = u.id 
     WHERE e.event_date >= CURDATE() 
     ORDER BY e.event_date ASC
 ");
-$stmt->execute();
+$stmt->execute([$myId]);
 $events = $stmt->fetchAll();
 ?>
 
@@ -102,6 +104,7 @@ $events = $stmt->fetchAll();
         <?php else: ?>
             <?php foreach ($events as $event): ?>
                 <div class="event-card">
+
                     <div style="background: var(--primary); color: white; display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; margin-bottom: 10px;">
                         <?= date('D, M j - g:i A', strtotime($event['event_date'])) ?>
                     </div>
@@ -117,6 +120,19 @@ $events = $stmt->fetchAll();
                         <strong>👤 Hosted by:</strong> <?= htmlspecialchars($event['username']) ?>
                     </div>
 
+                    <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee;">
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">
+                            <strong>👥 <?= $event['rsvp_count'] ?> Neighbors Going</strong>
+                        </div>
+
+                        <button
+                            onclick="handleRSVP(this, '<?= $event['id'] ?>')"
+                            class="primary-button rsvp-btn"
+                            style="width: auto; padding: 5px 15px; font-size: 0.8rem; background: <?= $event['is_my_rsvp'] ? '#28a745' : 'var(--primary)' ?>; cursor: pointer; border: none; border-radius: 4px; color: white;">
+                            <?= $event['is_my_rsvp'] ? '✓ Going' : 'Count Me In!' ?>
+                        </button>
+                    </div>
+
                     <?php if ($event['created_by'] == $myId || (isset($_SESSION['role']) && $_SESSION['role'] === 'admin')): ?>
                         <a href="index.php?page=events&delete_id=<?= $event['id'] ?>"
                             onclick="return confirm('Cancel this event?')"
@@ -127,3 +143,14 @@ $events = $stmt->fetchAll();
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+    function handleRSVP(btn, eventId) {
+        btn.disabled = true;
+        btn.innerText = 'Wait...';
+
+        setTimeout(() => {
+            window.location.href = 'index.php?page=events&rsvp_event_id=' + eventId;
+        }, 200);
+    }
+</script>

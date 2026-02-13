@@ -943,3 +943,20 @@ button:active {
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
+
+.rsvp-btn {
+    transition: transform 0.1s ease, opacity 0.2s;
+}
+
+.rsvp-btn:active {
+    transform: scale(0.95);
+}
+
+.rsvp-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+}
+
+.rsvp-btn:hover {
+    background: black;
+}
