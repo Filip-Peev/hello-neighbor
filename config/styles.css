@@ -825,10 +825,10 @@ button:active {
 .btn-doc-action {
     display: block;
     text-align: center;
-    background: #f8fafc;
+    background: var(--primary);
     padding: 12px;
     border-radius: 8px;
-    color: var(--primary);
+    color: white;
     font-weight: 600;
     text-decoration: none;
     border: 1px solid var(--border-color);
@@ -836,9 +836,7 @@ button:active {
 }
 
 .btn-doc-action:hover {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
+    background: var(--primary-hover);
 }
 
 .doc-delete-form {
@@ -949,7 +947,7 @@ button:active {
 }
 
 .rsvp-btn:active {
-    transform: scale(0.95);
+    transform: scale(0.90);
 }
 
 .rsvp-btn:disabled {

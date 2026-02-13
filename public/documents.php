@@ -36,7 +36,7 @@ if (!$userId) {
                 </div>
                 <div style="grid-column: span 2;">
                     <input type="file" name="doc_file" accept=".pdf,.jpg,.jpeg,.png" required>
-                    <button type="submit" style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; float: right;">Upload to Library</button>
+                    <button type="submit" style="margin-top: 15px">Upload to Library</button>
                 </div>
             </form>
             <div style="clear:both;"></div>

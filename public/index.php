@@ -75,8 +75,6 @@ function showAccessDenied($title, $reason)
                     <span class="logo-text">Hello Neighbor</span>
                 </a>
 
-                <a href="index.php?page=events" class="<?= ($page === 'events') ? 'active' : '' ?>">Events</a>
-
                 <a href="index.php?page=feed&tab=public" style="<?php echo ($page === 'feed' && $tab === 'public') ? 'text-decoration: underline;' : ''; ?>">
                     <?php echo $lang['nav_public']; ?>
                 </a>
@@ -100,10 +98,10 @@ function showAccessDenied($title, $reason)
             <div class="nav-right">
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="index.php?page=profile" style="<?php echo $page === 'profile' ? 'text-decoration: underline;' : ''; ?>">
-
                         <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong>
-
                     </a>
+
+                    <a href="index.php?page=events" class="<?= ($page === 'events') ? 'active' : '' ?>">Events</a>
 
                     <a href="index.php?page=messages" class="<?= ($page === 'messages') ? 'active' : '' ?>">Messages<?php if ($unreadCount > 0): ?>
                         <span style="background: var(--danger); color: white; padding: 2px 6px; border-radius: 50%; font-size: 0.7rem; margin-left: 5px;">

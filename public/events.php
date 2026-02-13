@@ -73,8 +73,7 @@ $stmt = $db->prepare("
          WHERE event_rsvps.event_id = e.id) as attendee_names
     FROM events e 
     JOIN users u ON e.created_by = u.id 
-    WHERE e.event_date >= CURDATE() 
-    ORDER BY e.event_date ASC
+    ORDER BY e.event_date DESC
 ");
 $stmt->execute([$myId]);
 $events = $stmt->fetchAll();
@@ -107,43 +106,41 @@ $events = $stmt->fetchAll();
             <p style="color: var(--text-muted);">No upcoming events. Why not plan one?</p>
         <?php else: ?>
             <?php foreach ($events as $event): ?>
-                <div class="event-card">
+                <?php $isPast = strtotime($event['event_date']) < time(); ?>
 
-                    <div style="background: var(--primary); color: white; display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; margin-bottom: 10px;">
+                <div class="event-card" style="position: relative; <?= $isPast ? 'opacity: 0.7; filter: grayscale(30%);' : '' ?>">
+
+                    <div style="background: <?= $isPast ? '#6c757d' : 'var(--primary)' ?>; color: white; display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; margin-bottom: 10px;">
+                        <?= $isPast ? '📜 PAST: ' : '' ?>
                         <?= date('D, M j - g:i A', strtotime($event['event_date'])) ?>
                     </div>
 
                     <h3 style="margin: 0 0 10px 0;"><?= htmlspecialchars($event['title']) ?></h3>
 
-                    <p style="font-size: 0.9rem; color: var(--text-main); margin-bottom: 15px;">
-                        <?= nl2br(htmlspecialchars($event['description'])) ?>
-                    </p>
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                        <div style="margin-bottom: 15px; padding: 8px; background: #f0f7ff; border-radius: 4px; border: 1px dashed #bcdbff;">
+                            <strong style="font-size: 0.75rem; color: #004085; display: block;">Who's Going:</strong>
+                            <p style="font-size: 0.8rem; color: #004085; margin: 0;">
+                                <?= $event['attendee_names'] ? htmlspecialchars($event['attendee_names']) : 'No one yet' ?>
+                            </p>
+                        </div>
+                    <?php endif; ?>
 
-                    <div style="font-size: 0.85rem; color: var(--text-muted);">
-                        <strong>📍 Location:</strong> <?= htmlspecialchars($event['location'] ?: 'Not specified') ?><br>
-                        <strong>👤 Hosted by:</strong> <?= htmlspecialchars($event['username']) ?>
-                    </div>
-
-                    <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee;">
+                    <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 10px;">
                         <div style="font-size: 0.85rem; color: var(--text-muted);">
-                            <strong>👥 <?= $event['rsvp_count'] ?> Neighbors Going</strong>
+                            <strong>👥 <?= $event['rsvp_count'] ?> Neighbors <?= $isPast ? 'Went' : 'Going' ?></strong>
                         </div>
 
-                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                            <div style="margin-top: 10px; padding: 8px; background: #f0f7ff; border-radius: 4px; border: 1px dashed #bcdbff;">
-                                <strong style="font-size: 0.75rem; color: #004085; display: block; margin-bottom: 2px;">Who's Going:</strong>
-                                <p style="font-size: 0.8rem; color: #004085; margin: 0;">
-                                    <?= $event['attendee_names'] ? htmlspecialchars($event['attendee_names']) : 'No one yet' ?>
-                                </p>
-                            </div>
+                        <?php if (!$isPast): ?>
+                            <button
+                                onclick="handleRSVP(this, '<?= $event['id'] ?>')"
+                                class="rsvp-btn"
+                                style="width: auto; padding: 5px 15px; font-size: 0.8rem; background: <?= $event['is_my_rsvp'] ? '#28a745' : 'var(--primary)' ?>; cursor: pointer; border: none; border-radius: 4px; color: white;">
+                                <?= $event['is_my_rsvp'] ? '✓ Going' : 'Count Me In!' ?>
+                            </button>
+                        <?php else: ?>
+                            <span style="font-size: 0.8rem; color: #888; font-style: italic;">Event Concluded</span>
                         <?php endif; ?>
-
-                        <button
-                            onclick="handleRSVP(this, '<?= $event['id'] ?>')"
-                            class="primary-button rsvp-btn"
-                            style="width: auto; padding: 5px 15px; font-size: 0.8rem; background: <?= $event['is_my_rsvp'] ? '#28a745' : 'var(--primary)' ?>; cursor: pointer; border: none; border-radius: 4px; color: white;">
-                            <?= $event['is_my_rsvp'] ? '✓ Going' : 'Count Me In!' ?>
-                        </button>
                     </div>
 
                     <?php if ($event['created_by'] == $myId || (isset($_SESSION['role']) && $_SESSION['role'] === 'admin')): ?>
@@ -151,19 +148,18 @@ $events = $stmt->fetchAll();
                             onclick="return confirm('Cancel this event?')"
                             style="position: absolute; top: 10px; right: 10px; text-decoration: none; color: #ff4444; font-size: 1.2rem;">&times;</a>
                     <?php endif; ?>
-                </div>
-            <?php endforeach; ?>
+
+                </div> <?php endforeach; ?>
         <?php endif; ?>
     </div>
-</div>
 
-<script>
-    function handleRSVP(btn, eventId) {
-        btn.disabled = true;
-        btn.innerText = 'Wait...';
+    <script>
+        function handleRSVP(btn, eventId) {
+            btn.disabled = true;
+            btn.innerText = 'Wait...';
 
-        setTimeout(() => {
-            window.location.href = 'index.php?page=events&rsvp_event_id=' + eventId;
-        }, 200);
-    }
-</script>
+            setTimeout(() => {
+                window.location.href = 'index.php?page=events&rsvp_event_id=' + eventId;
+            }, 200);
+        }
+    </script>

@@ -120,6 +120,17 @@ switch ($status) {
 }
 
 // 2. DATA FETCH: Get user details for display
+
+$rsvpStmt = $db->prepare("
+    SELECT e.title, e.event_date, e.id 
+    FROM event_rsvps r 
+    JOIN events e ON r.event_id = e.id 
+    WHERE r.user_id = ? AND e.event_date >= CURDATE()
+    ORDER BY e.event_date ASC
+");
+$rsvpStmt->execute([$userId]);
+$myRsvps = $rsvpStmt->fetchAll();
+
 $stmt = $db->prepare("SELECT username, email, summary, created_at, last_login FROM users WHERE id = ?");
 $stmt->execute([$userId]);
 $userData = $stmt->fetch();
@@ -136,8 +147,24 @@ $userData = $stmt->fetch();
     </p>
 </div>
 
+<div class="profile-card" style="margin-bottom: 25px;">
+    <h3 style="margin-top:0;">📅 Your Upcoming Events</h3>
+    <?php if (empty($myRsvps)): ?>
+        <p style="color: #666; font-size: 0.9rem;">You haven't joined any events yet. Check the calendar!</p>
+    <?php else: ?>
+        <ul style="list-style: none; padding: 0;">
+            <?php foreach ($myRsvps as $rsvp): ?>
+                <li style="margin-bottom: 8px; display: flex; justify-content: space-between;">
+                    <span><strong><?= date('M j', strtotime($rsvp['event_date'])) ?></strong> - <?= htmlspecialchars($rsvp['title']) ?></span>
+                    <a href="index.php?page=events" style="font-size: 0.8rem; color: var(--primary);">View</a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
+</div>
+
 <div class="card">
-    <h3 class="card-title">🏠 Your Neighbor Summary</h3>
+    <h3 class="card-title">🏠 Your Summary</h3>
 
     <p class="card-description">
         Tell your neighbors what you do or how you can help (e.g., "Professional Plumber", "Available for pet sitting", "I have a ladder you can borrow").
@@ -156,6 +183,7 @@ $userData = $stmt->fetch();
 </div>
 
 <div class="profile-grid">
+
     <div class="profile-card">
         <h3>Update Email</h3>
         <form method="POST" action="index.php?page=profile">
