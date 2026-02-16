@@ -370,6 +370,7 @@ button:active {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     margin-bottom: 30px;
+    transition: all 0.2s ease;
 }
 
 .card:hover {
@@ -377,6 +378,8 @@ button:active {
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
+
+
 
 .card-title {
     margin-top: 0;
@@ -465,6 +468,7 @@ button:active {
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
 }
 
 .profile-card:hover {
@@ -484,6 +488,7 @@ button:active {
     padding: 20px;
     border: 1px solid #ffa8a8;
     border-radius: 8px;
+    transition: all 0.2s ease;
 }
 
 .danger-card:hover {
