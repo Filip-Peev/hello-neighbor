@@ -147,22 +147,6 @@ $userData = $stmt->fetch();
     </p>
 </div>
 
-<div class="profile-card" style="margin-bottom: 25px;">
-    <h3 style="margin-top:0;">📅 Your Upcoming Events</h3>
-    <?php if (empty($myRsvps)): ?>
-        <p style="color: #666; font-size: 0.9rem;">You haven't joined any events yet. Check the calendar!</p>
-    <?php else: ?>
-        <ul style="list-style: none; padding: 0;">
-            <?php foreach ($myRsvps as $rsvp): ?>
-                <li style="margin-bottom: 8px; display: flex; justify-content: space-between;">
-                    <span><strong><?= date('M j', strtotime($rsvp['event_date'])) ?></strong> - <?= htmlspecialchars($rsvp['title']) ?></span>
-                    <a href="index.php?page=events" style="font-size: 0.8rem; color: var(--primary);">View</a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
-</div>
-
 <div class="card">
     <h3 class="card-title">🏠 Your Summary</h3>
 
@@ -183,6 +167,35 @@ $userData = $stmt->fetch();
 </div>
 
 <div class="profile-grid">
+
+    <div class="profile-card" style="margin-bottom: 25px;">
+        <h3 style="margin-top:0;">📅 Your Upcoming Events</h3>
+        <?php if (empty($myRsvps)): ?>
+            <p style="color: #666; font-size: 0.9rem;">You haven't joined any events yet. Check the calendar!</p>
+        <?php else: ?>
+            <ul style="list-style: none; padding: 0;">
+                <?php foreach ($myRsvps as $rsvp): ?>
+                    <li style="margin-bottom: 8px; display: flex; justify-content: space-between;">
+                        <span><strong><?= date('M j', strtotime($rsvp['event_date'])) ?></strong> - <?= htmlspecialchars($rsvp['title']) ?></span>
+                        <a href="index.php?page=events" style="font-size: 0.8rem; color: var(--primary);">View</a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    </div>
+
+    <div class="profile-card" style="margin-bottom: 25px;">
+        <h3 style="margin-top:0;">📋 TaskBoard</h3>
+
+        <p style="color: #666; font-size: 0.9rem;">
+            Manage your tasks, track progress, and stay organized in one place.
+        </p>
+
+        <a href="http://127.0.0.1/task-board/" target="_blank"
+            style="font-size: 0.9rem; color: var(--primary); font-weight: 600; text-decoration: none;">
+            <br>Open TaskBoard →
+        </a>
+    </div>
 
     <div class="profile-card">
         <h3>Update Email</h3>
