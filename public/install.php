@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Europe/Sofia');
 $envPath = __DIR__ . '/../.env';
 
 if (file_exists($envPath)) {
@@ -44,6 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     summary TEXT NULL,
                     is_verified TINYINT(1) DEFAULT 0,
                     verification_token VARCHAR(100) DEFAULT NULL,
+                    reset_token VARCHAR(100) DEFAULT NULL,
+                    reset_expires DATETIME DEFAULT NULL,
                     is_deleted TINYINT(1) DEFAULT 0,
                     last_login DATETIME DEFAULT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

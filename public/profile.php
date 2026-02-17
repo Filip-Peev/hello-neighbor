@@ -1,5 +1,4 @@
 <?php
-// public/profile.php
 
 // 1. Security check: Only members allowed
 if (!isset($_SESSION['user_id'])) {
@@ -30,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 // Generate new token for the new email address
                 $newToken = bin2hex(random_bytes(32));
-                
+
                 $stmt = $db->prepare("UPDATE users SET email = ?, is_verified = 0, verification_token = ? WHERE id = ?");
                 $stmt->execute([$newEmail, $newToken, $userId]);
 
@@ -38,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
                 $host = $_SERVER['HTTP_HOST'];
                 $verifyLink = "$protocol://$host" . dirname($_SERVER['PHP_SELF']) . "/verify.php?token=$newToken";
-                
+
                 $subject = "Verify your new email address";
                 $message = "You have updated your email. Please click here to verify it: $verifyLink";
                 mail($newEmail, $subject, $message, "From: noreply@neighbor-app.com");
@@ -47,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 session_destroy();
                 header("Location: index.php?page=login&status=verify_new_email");
                 exit;
-
             } catch (PDOException $e) {
                 header("Location: index.php?page=profile&status=error_email_exists");
                 exit;

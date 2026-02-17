@@ -1,5 +1,5 @@
 <?php
-// public/messages.php
+
 if (!isset($_SESSION['user_id'])) {
     showAccessDenied("Messages", "Private Inbox");
     return;

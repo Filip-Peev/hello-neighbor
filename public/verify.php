@@ -1,5 +1,4 @@
 <?php
-// verify.php
 require_once '../config/database.php';
 
 $message = "";
