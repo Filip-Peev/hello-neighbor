@@ -23,15 +23,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // B. Handle Email Update
+    // B. Handle Email Update (Updated for Verification)
     if (isset($_POST['update_email'])) {
         $newEmail = trim($_POST['email'] ?? '');
         if (filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
             try {
-                $stmt = $db->prepare("UPDATE users SET email = ? WHERE id = ?");
-                $stmt->execute([$newEmail, $userId]);
-                header("Location: index.php?page=profile&status=email_updated");
+                // Generate new token for the new email address
+                $newToken = bin2hex(random_bytes(32));
+                
+                $stmt = $db->prepare("UPDATE users SET email = ?, is_verified = 0, verification_token = ? WHERE id = ?");
+                $stmt->execute([$newEmail, $newToken, $userId]);
+
+                // Construct verification link
+                $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+                $host = $_SERVER['HTTP_HOST'];
+                $verifyLink = "$protocol://$host" . dirname($_SERVER['PHP_SELF']) . "/verify.php?token=$newToken";
+                
+                $subject = "Verify your new email address";
+                $message = "You have updated your email. Please click here to verify it: $verifyLink";
+                mail($newEmail, $subject, $message, "From: noreply@neighbor-app.com");
+
+                // Log user out: they must verify to get back in
+                session_destroy();
+                header("Location: index.php?page=login&status=verify_new_email");
                 exit;
+
             } catch (PDOException $e) {
                 header("Location: index.php?page=profile&status=error_email_exists");
                 exit;
@@ -87,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// --- MESSAGE HANDLING: Convert URL status to user-friendly messages ---
+// --- MESSAGE HANDLING ---
 $status = $_GET['status'] ?? '';
 switch ($status) {
     case 'summary_updated':
@@ -119,7 +135,7 @@ switch ($status) {
         break;
 }
 
-// 2. DATA FETCH: Get user details for display
+// 2. DATA FETCH
 
 $rsvpStmt = $db->prepare("
     SELECT e.title, e.event_date, e.id 
@@ -149,29 +165,23 @@ $userData = $stmt->fetch();
 
 <div class="card">
     <h3 class="card-title">🏠 Your Summary</h3>
-
     <p class="card-description">
-        Tell your neighbors what you do or how you can help (e.g., "Professional Plumber", "Available for pet sitting", "I have a ladder you can borrow").
+        Tell your neighbors what you do or how you can help.
     </p>
-
-    <form method="POST" action="index.php?page=profile"><textarea name="summary" id="postContent" class="summary-textarea" maxlength="500" minlength="2" placeholder="Write a short summary of your skills or how you can help..."><?php echo htmlspecialchars($userData['summary'] ?? ''); ?></textarea>
-
+    <form method="POST" action="index.php?page=profile">
+        <textarea name="summary" id="postContent" class="summary-textarea" maxlength="500" minlength="2" placeholder="Write a short summary..."><?php echo htmlspecialchars($userData['summary'] ?? ''); ?></textarea>
         <div style="text-align: right; font-size: 0.75rem; color: #888; margin-top: 0px;">
             <span id="charCount">0</span>/500
         </div>
-
-        <button type="submit" name="update_summary" class="primary-button">
-            Save Summary
-        </button>
+        <button type="submit" name="update_summary" class="primary-button">Save Summary</button>
     </form>
 </div>
 
 <div class="profile-grid">
-
     <div class="profile-card" style="margin-bottom: 25px;">
         <h3 style="margin-top:0;">📅 Your Upcoming Events</h3>
         <?php if (empty($myRsvps)): ?>
-            <p style="color: #666; font-size: 0.9rem;">You haven't joined any events yet. Check the calendar!</p>
+            <p style="color: #666; font-size: 0.9rem;">You haven't joined any events yet.</p>
         <?php else: ?>
             <ul style="list-style: none; padding: 0;">
                 <?php foreach ($myRsvps as $rsvp): ?>
@@ -186,88 +196,41 @@ $userData = $stmt->fetch();
 
     <div class="profile-card" style="margin-bottom: 25px;">
         <h3 style="margin-top:0;">📋 TaskBoard</h3>
-
-        <p style="color: #666; font-size: 0.9rem;">
-            Manage your tasks, track progress, and stay organized in one place.
-        </p>
-
-        <a href="http://127.0.0.1/task-board/" target="_blank"
-            style="font-size: 0.9rem; color: var(--primary); font-weight: 600; text-decoration: none;">
+        <p style="color: #666; font-size: 0.9rem;">Manage your tasks and stay organized.</p>
+        <a href="http://127.0.0.1/task-board/" target="_blank" style="font-size: 0.9rem; color: var(--primary); font-weight: 600; text-decoration: none;">
             <br>Open TaskBoard →
         </a>
     </div>
 
     <div class="profile-card">
         <h3>Update Email</h3>
+        <p style="font-size: 0.8rem; color: #856404; background: #fff3cd; padding: 5px; border-radius: 4px;">
+            ⚠️ Changing email will require re-verification.
+        </p>
         <form method="POST" action="index.php?page=profile">
-            <input
-                type="email"
-                name="email"
-                value="<?php echo htmlspecialchars($userData['email']); ?>"
-                required
-                class="profile-input">
-
-            <button type="submit" name="update_email" class="primary-button">
-                Save Email
-            </button>
+            <input type="email" name="email" value="<?php echo htmlspecialchars($userData['email']); ?>" required class="profile-input">
+            <button type="submit" name="update_email" class="primary-button">Save Email</button>
         </form>
     </div>
 
     <div class="profile-card">
         <h3>Change Password</h3>
-
         <form method="POST" action="index.php?page=profile">
-            <input
-                type="password"
-                name="current_password"
-                placeholder="Current Password"
-                required
-                class="profile-input">
-
-            <input
-                type="password"
-                name="new_password"
-                placeholder="New Password"
-                required
-                class="profile-input">
-
-            <input
-                type="password"
-                name="confirm_password"
-                placeholder="Confirm New"
-                required
-                class="profile-input profile-input--last">
-
-            <button type="submit" name="change_password" class="primary-button">
-                Update Password
-            </button>
+            <input type="password" name="current_password" placeholder="Current Password" required class="profile-input">
+            <input type="password" name="new_password" placeholder="New Password" required class="profile-input">
+            <input type="password" name="confirm_password" placeholder="Confirm New" required class="profile-input profile-input--last">
+            <button type="submit" name="change_password" class="primary-button">Update Password</button>
         </form>
     </div>
 </div>
-
 
 <hr style="margin: 40px 0; border: 0; border-top: 1px solid #eee;">
 
 <div class="danger-card">
     <h3 class="danger-title">Danger Zone</h3>
-
-    <p class="card-description">
-        Deleting your account is permanent. This will mark your account as inactive, and you will no longer be able to log in. Your public profile will be hidden from the neighbor directory, but your existing posts and comments will remain to keep the conversation history intact.
-    </p>
-
-    <form
-        method="POST"
-        action="index.php?page=profile"
-        onsubmit="return confirm('Are you sure?');">
-        <input
-            type="password"
-            name="delete_confirm_pass"
-            placeholder="Enter password to confirm"
-            required
-            class="danger-input">
-
-        <button type="submit" name="delete_account" class="delete-account-button">
-            Delete My Account
-        </button>
+    <p class="card-description">Deleting your account is permanent.</p>
+    <form method="POST" action="index.php?page=profile" onsubmit="return confirm('Are you sure?');">
+        <input type="password" name="delete_confirm_pass" placeholder="Enter password to confirm" required class="danger-input">
+        <button type="submit" name="delete_account" class="delete-account-button">Delete My Account</button>
     </form>
 </div>

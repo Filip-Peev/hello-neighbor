@@ -16,19 +16,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // 2. Verify the password against the stored hash
             if ($user && password_verify($pass, $user['password_hash'])) {
-                // 3. Start a session and "log them in"
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];
 
-                // 4. Update the last_login timestamp
-                $updateStmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
-                $updateStmt->execute([$user['id']]);
+                // --- NEW: Email Verification Check ---
+                if (isset($user['is_verified']) && $user['is_verified'] == 0) {
+                    echo "<div style='background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 15px; border-radius: 8px; margin-bottom: 20px;'>";
+                    echo "⚠️ <strong>Account Not Verified:</strong> Please check your email inbox to activate your account before logging in.";
+                    echo "</div>";
+                } else {
+                    // 3. Start a session and "log them in"
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['username'] = $user['username'];
+                    $_SESSION['role'] = $user['role'];
 
-                $loginSuccess = true;
-                echo "<p style='color: green; font-weight: bold;'>✅ Login successful! Welcome back, " . htmlspecialchars($user['username']) . ".</p>";
-                echo "<p>Redirecting you to the home page...</p>";
-                echo "<script>setTimeout(() => { window.location.href = 'index.php?page=feed'; }, 2000);</script>";
+                    // 4. Update the last_login timestamp
+                    $updateStmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+                    $updateStmt->execute([$user['id']]);
+
+                    $loginSuccess = true;
+                    echo "<p style='color: green; font-weight: bold;'>✅ Login successful! Welcome back, " . htmlspecialchars($user['username']) . ".</p>";
+                    echo "<p>Redirecting you to the home page...</p>";
+                    echo "<script>setTimeout(() => { window.location.href = 'index.php?page=feed'; }, 2000);</script>";
+                }
             } else {
                 echo "<p style='color: red;'>❌ Invalid username or password.</p>";
             }

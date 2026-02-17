@@ -42,6 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     password_hash VARCHAR(255) NOT NULL,
                     role ENUM('user', 'admin') DEFAULT 'user',
                     summary TEXT NULL,
+                    is_verified TINYINT(1) DEFAULT 0,
+                    verification_token VARCHAR(100) DEFAULT NULL,
                     is_deleted TINYINT(1) DEFAULT 0,
                     last_login DATETIME DEFAULT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -102,7 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                 );
 
-                -- NEW: Direct Messaging Tables
                 CREATE TABLE IF NOT EXISTS conversations (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     user_one INT NOT NULL,
@@ -148,9 +149,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $pdo->exec($sql);
 
-            // 2. Insert Admin Account
+            // 2. Insert Admin Account (Set is_verified to 1)
             $hashedAdminPass = password_hash($adminPass, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, 'admin')");
+            $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash, role, is_verified) VALUES (?, ?, ?, 'admin', 1)");
             $stmt->execute([$adminUser, $adminEmail, $hashedAdminPass]);
             $adminId = $pdo->lastInsertId();
 
@@ -169,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $envContent = "DB_HOST=\"$host\"\nDB_PORT=\"$port\"\nDB_NAME=\"$dbName\"\nDB_USER=\"$user\"\nMARIADB_PASS=\"$pass\"";
             file_put_contents($envPath, $envContent);
 
-            // 5. Lock installer by renaming it
+            // 5. Lock installer
             $installerPath = __FILE__;
             $lockedPath = __DIR__ . '/install.php.locked';
 
@@ -234,7 +235,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <button type="submit" name="install" style="width:100%; margin-top:20px; font-weight: bold;">Run Installation</button>
         </form>
-
     </div>
 
     <footer style="text-align: center; margin-top: 40px; padding: 20px; color: #888; font-size: 0.85rem;">
