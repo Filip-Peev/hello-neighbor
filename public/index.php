@@ -110,11 +110,11 @@ function showAccessDenied($title, $reason)
                     <a href="logout.php" style="color: #ff6666;"><?php echo $lang['nav_logout']; ?></a>
 
                 <?php else: ?>
-                    <a href="index.php?page=register" style="<?php echo $page === 'register' ? 'text-decoration: underline;' : ''; ?>">
-                        <?php echo $lang['nav_register']; ?>
-                    </a>
                     <a href="index.php?page=login" style="<?php echo $page === 'login' ? 'text-decoration: underline;' : ''; ?>">
                         <?php echo $lang['nav_login']; ?>
+                    </a>
+                    <a href="index.php?page=register" style="<?php echo $page === 'register' ? 'text-decoration: underline;' : ''; ?>">
+                        <?php echo $lang['nav_register']; ?>
                     </a>
                 <?php endif; ?>
             </div>
