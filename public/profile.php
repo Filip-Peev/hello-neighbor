@@ -195,7 +195,7 @@ $userData = $stmt->fetch();
     <div class="profile-card" style="margin-bottom: 25px;">
         <h3 style="margin-top:0;">📋 TaskBoard</h3>
         <p style="color: #666; font-size: 0.9rem;">Manage your tasks and stay organized.</p>
-        <a href="http://127.0.0.1/task-board/" target="_blank" style="font-size: 0.9rem; color: var(--primary); font-weight: 600; text-decoration: none;">
+        <a href="/../task-board/" target="_blank" style="font-size: 0.9rem; color: var(--primary); font-weight: 600; text-decoration: none;">
             <br>Open TaskBoard →
         </a>
     </div>
