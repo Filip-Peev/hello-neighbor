@@ -1,7 +1,6 @@
 <?php
 ob_start();
 session_start();
-
 $supported_langs = ['en', 'bg'];
 
 $lang_code = $_GET['lang'] ?? $_SESSION['lang'] ?? 'en';
@@ -42,9 +41,7 @@ if (isset($_SESSION['user_id'])) {
 $page = $_GET['page'] ?? 'feed';
 $tab = $_GET['tab'] ?? 'public';
 
-/**
- * Helper function to display a consistent "Access Denied" message
- */
+// Helper function to display a consistent "Access Denied" message
 function showAccessDenied($title, $reason)
 {
     echo "<div style='text-align: center; padding: 40px 20px;'>";

@@ -1,7 +1,6 @@
 <?php
-// public/login.php
 
-$loginSuccess = false; // Track if login was successful to control the UI
+$loginSuccess = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userOrEmail = trim($_POST['identifier'] ?? '');
@@ -53,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" maxlength="50" minlength="2" name="identifier" placeholder="Username or Email" required><br>
         <input type="password" maxlength="50" minlength="2" name="password" placeholder="Password" required><br>
         <button type="submit" id="loginBtn">Login</button>
+        <a href="forgot_password.php" style="text-decoration: none; display: block; margin-top: 15px; font-size: 0.85rem; color: var(--text-muted);">Forgot your password?</a>
     </form>
 <?php endif; ?>
 
