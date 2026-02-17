@@ -1,5 +1,5 @@
 <?php
-
+date_default_timezone_set('Europe/Sofia');
 class Database
 {
     private static $instance = null;
@@ -8,13 +8,13 @@ class Database
     {
         if (self::$instance === null) {
             $envPath = __DIR__ . '/../.env';
-            
+
             if (!file_exists($envPath)) {
                 die("Error: Configuration file (.env) is missing. Please run the installer.");
             }
 
             $env = parse_ini_file($envPath);
-            
+
             $host = $env['DB_HOST']      ?? '';
             $port = $env['DB_PORT']      ?? '';
             $db   = $env['DB_NAME']      ?? '';
