@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
         <form method="POST">
             <label>Enter your account email</label>
-            <input type="email" name="email" placeholder="neighbor@example.com" required>
+            <input type="email" name="email" placeholder="yourmail@example.com" required>
             <button type="submit" class="primary-button" style="width: 100%; margin-top: 10px;">Send Reset Link</button>
         </form>
         <p style="margin-top: 20px;"><a href="index.php?page=login" style="text-decoration: none; display: block; margin-top: 15px; font-size: 0.85rem; color: var(--text-muted);">Back to Login</a></p>
