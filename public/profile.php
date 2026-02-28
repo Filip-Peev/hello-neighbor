@@ -27,22 +27,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newEmail = trim($_POST['email'] ?? '');
         if (filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
             try {
-                // Generate new token for the new email address
                 $newToken = bin2hex(random_bytes(32));
 
                 $stmt = $db->prepare("UPDATE users SET email = ?, is_verified = 0, verification_token = ? WHERE id = ?");
                 $stmt->execute([$newEmail, $newToken, $userId]);
 
-                // Construct verification link
+                // --- IMPROVED MAIL LOGIC ---
                 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
-                $host = $_SERVER['HTTP_HOST'];
+                $host = $_SERVER['HTTP_HOST']; // Dynamically get the host
                 $verifyLink = "$protocol://$host" . dirname($_SERVER['PHP_SELF']) . "/verify.php?token=$newToken";
 
                 $subject = "Verify your new email address";
                 $message = "You have updated your email. Please click here to verify it: $verifyLink";
-                mail($newEmail, $subject, $message, "From: noreply@neighbor-app.com");
 
-                // Log user out: they must verify to get back in
+                // Match the headers from register.php
+                $headers = "MIME-Version: 1.0" . "\r\n";
+                $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+                $headers .= "From: Hello Neighbor <noreply@$host>" . "\r\n";
+
+                mail($newEmail, $subject, $message, $headers);
+                // ---------------------------
+
                 session_destroy();
                 header("Location: index.php?page=login&status=verify_new_email");
                 exit;

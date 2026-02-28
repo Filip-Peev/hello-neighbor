@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $checkStmt->execute([$user, $email]);
 
             if ($checkStmt->fetch()) {
-                echo "<p style='color: red;'>❌ Username or e‑mail already in use.</p>";
+                echo "<p style='color: red;'>❌ Username or e-mail already in use.</p>";
                 return;
             }
         } catch (PDOException $e) {
@@ -38,26 +38,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $subject = "Welcome to Hello Neighbor!";
 
             $emailBody = "
-            <html>
-            <body style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>
-                <div style='max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;'>
-                    <h2 style='color: #2563eb;'>🏘️ Welcome to the Neighborhood!</h2>
-                    <p>Hi <strong>$user</strong>,</p>
-                    <p>Thanks for joining <strong>Hello Neighbor</strong>. Please confirm your email address to activate your account and start connecting with your neighbors.</p>
-                    
-                    <div style='text-align: center; margin: 30px 0;'>
-                        <a href='$verifyLink' style='background-color: #2563eb; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>Verify My Account</a>
+                <html>
+                <body style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>
+                    <div style='max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;'>
+                        <h2 style='color: #2563eb;'>🏘️ Welcome to the Neighborhood!</h2>
+                        <p>Hi <strong>$user</strong>,</p>
+
+                        <p><strong>Hello Neighbor</strong> is a web application created strictly for learning and educational purposes.</p>
+
+                        <p>Please note that all content and data shared on this platform is considered public. 
+                        By verifying your account and using this platform, you acknowledge that you understand 
+                        this is a learning project and you agree to participate voluntarily in all activities 
+                        and features provided within the application.</p>
+
+                        <p>Please confirm your email address to activate your account and start connecting with your neighbors.</p>
+                        
+                        <div style='text-align: center; margin: 30px 0;'>
+                            <a href='$verifyLink' style='background-color: #2563eb; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>Verify My Account</a>
+                        </div>
+                        
+                        <p style='font-size: 0.85rem; color: #64748b;'>
+                            If the button doesn't work, copy and paste this link into your browser:<br>
+                            <a href='$verifyLink'>$verifyLink</a>
+                        </p>
+
+                        <hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;'>
+
+                        <p style='font-size: 0.8rem; color: #94a3b8;'>
+                            If you did not sign up for this account, you can safely ignore this email.
+                        </p>
                     </div>
-                    
-                    <p style='font-size: 0.85rem; color: #64748b;'>
-                        If the button doesn't work, copy and paste this link into your browser:<br>
-                        <a href='$verifyLink'>$verifyLink</a>
-                    </p>
-                    <hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;'>
-                    <p style='font-size: 0.8rem; color: #94a3b8;'>If you did not sign up for this account, you can safely ignore this email.</p>
-                </div>
-            </body>
-            </html>";
+                </body>
+                </html>";
 
             $headers = "MIME-Version: 1.0" . "\r\n";
             $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";

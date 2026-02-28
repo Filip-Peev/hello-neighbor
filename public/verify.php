@@ -34,6 +34,7 @@ if (isset($_GET['token'])) {
 
 <head>
     <title>Email Verification</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 
