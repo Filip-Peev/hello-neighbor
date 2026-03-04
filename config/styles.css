@@ -244,9 +244,24 @@ button:active {
     }
 
     .profile-grid {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 20px !important;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 500px) {
+    .directory-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .directory-search-form {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .search-wrapper {
+        max-width: 100%;
     }
 }
 
@@ -693,27 +708,6 @@ button:active {
 .neighbor-summary-empty {
     font-size: 0.9rem;
     color: #333;
-}
-
-@media (max-width: 500px) {
-    .directory-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .directory-search-form {
-        flex-direction: column;
-        gap: 10px;
-        align-items: stretch;
-    }
-
-    .neighbor-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .search-wrapper {
-        max-width: 100%;
-    }
 }
 
 #loginForm input,
