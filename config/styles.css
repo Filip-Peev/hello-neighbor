@@ -209,31 +209,6 @@ button:active {
         gap: 15px;
     }
 
-    .container {
-        margin: 10px;
-        padding: 20px;
-    }
-
-    nav {
-        margin-top: 0;
-        border-radius: 0;
-    }
-}
-
-@media (max-width: 600px) {
-    .nav-container {
-        gap: 5px;
-        padding: 10px 0;
-        align-items: center;
-    }
-
-    .nav-left,
-    .nav-right {
-        flex-direction: column;
-        gap: 5px;
-        align-items: center;
-    }
-
     .nav-left a,
     .nav-right a {
         width: 100%;
@@ -249,9 +224,23 @@ button:active {
         margin-top: 0;
         border-radius: 0;
     }
+}
+
+@media (max-width: 600px) {
+    .nav-container {
+        gap: 5px;
+        align-items: center;
+    }
+
+    .nav-left,
+    .nav-right {
+        flex-direction: column;
+        gap: 5px;
+        align-items: center;
+    }
 
     .comments-container {
-        margin-left: 0px
+        margin-left: 0;
     }
 
     .profile-grid {
