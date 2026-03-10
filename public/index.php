@@ -1,17 +1,17 @@
 <?php
 ob_start();
 session_start();
+
+// --- Configuration & Language ---
 $supported_langs = ['en', 'bg'];
-
 $lang_code = $_GET['lang'] ?? $_SESSION['lang'] ?? 'en';
-
 if (!in_array($lang_code, $supported_langs)) {
     $lang_code = 'en';
 }
-
 $_SESSION['lang'] = $lang_code;
 $lang = include "../languages/{$lang_code}.php";
 
+// --- Environment & Database ---
 if (!file_exists(__DIR__ . '/../.env')) {
     header("Location: install.php");
     exit;
@@ -25,8 +25,10 @@ try {
     die("Application Error: " . $e->getMessage());
 }
 
+// --- User Context & Messaging ---
+$isLoggedIn = isset($_SESSION['user_id']);
 $unreadCount = 0;
-if (isset($_SESSION['user_id'])) {
+if ($isLoggedIn) {
     $unreadStmt = $db->prepare("
         SELECT COUNT(*) FROM messages m
         JOIN conversations c ON m.conversation_id = c.id
@@ -38,17 +40,44 @@ if (isset($_SESSION['user_id'])) {
     $unreadCount = $unreadStmt->fetchColumn();
 }
 
+// --- Routing Configuration ---
 $page = $_GET['page'] ?? 'feed';
 $tab = $_GET['tab'] ?? 'public';
 
-// Helper function to display a consistent "Access Denied" message
+/**
+ * Route Structure:
+ * 'key' => ['auth' => bool, 'label' => string/null (null hides it from nav)]
+ */
+$routes = [
+    'feed'      => ['auth' => false, 'label' => $lang['nav_public']],
+    'polls'     => ['auth' => false, 'label' => $lang['nav_polls']],
+    'directory' => ['auth' => true,  'label' => 'Directory'],
+    'documents' => ['auth' => true,  'label' => $lang['nav_documents']],
+    'events'    => ['auth' => true,  'label' => 'Events'],
+    'messages'  => ['auth' => true,  'label' => 'Messages'],
+    'profile'   => ['auth' => true,  'label' => $_SESSION['username'] ?? 'Profile'],
+    'login'     => ['auth' => false, 'label' => $lang['nav_login']],
+    'register'  => ['auth' => false, 'label' => $lang['nav_register']],
+];
+
+// Content Metadata for Access Denied screens
+$pageMeta = [
+    'directory' => ['title' => 'Directory', 'reason' => 'the neighbor list and skills search'],
+    'documents' => ['title' => 'Documents', 'reason' => 'building files and records'],
+    'profile'   => ['title' => 'Profile',   'reason' => 'your personal settings'],
+    'messages'  => ['title' => 'Messages',  'reason' => 'your conversations'],
+    'private'   => ['title' => 'Private',   'reason' => 'resident-only discussions'],
+    'other'     => ['title' => 'Other',     'reason' => 'resident-only discussions'],
+];
+
 function showAccessDenied($title, $reason)
 {
-    echo "<div style='text-align: center; padding: 40px 20px;'>";
-    echo "<h2>🔒 Member Access Only</h2>";
-    echo "<p>Access to <strong>$title</strong> ($reason) is reserved for registered residents.</p>";
-    echo "<p>Please <a href='index.php?page=login' style='color: var(--primary); font-weight: bold;'>Login</a> or <a href='index.php?page=register' style='color: var(--primary); font-weight: bold;'>Register</a> to continue.</p>";
-    echo "</div>";
+    echo "<div style='text-align: center; padding: 40px 20px;'>
+            <h2>🔒 Member Access Only</h2>
+            <p>Access to <strong>$title</strong> ($reason) is reserved for registered residents.</p>
+            <p>Please <a href='index.php?page=login' style='color: var(--primary); font-weight: bold;'>Login</a> or 
+               <a href='index.php?page=register' style='color: var(--primary); font-weight: bold;'>Register</a> to continue.</p>
+          </div>";
 }
 ?>
 
@@ -72,50 +101,36 @@ function showAccessDenied($title, $reason)
                     <span class="logo-text">Hello Neighbor</span>
                 </a>
 
-                <a href="index.php?page=feed&tab=public" style="<?php echo ($page === 'feed' && $tab === 'public') ? 'text-decoration: underline;' : ''; ?>">
-                    <?php echo $lang['nav_public']; ?>
-                </a>
+                <?php foreach (['feed', 'polls', 'directory', 'documents'] as $key): ?>
+                    <?php if (!$routes[$key]['auth'] || $isLoggedIn): ?>
+                        <a href="index.php?page=<?= $key ?><?= ($key === 'feed') ? '&tab=public' : '' ?>"
+                            style="<?= ($page === $key) ? 'text-decoration: underline;' : '' ?>">
+                            <?= $routes[$key]['label'] ?>
+                        </a>
+                    <?php endif; ?>
+                <?php endforeach; ?>
 
-                <a href="index.php?page=polls" style="<?php echo ($page === 'polls') ? 'text-decoration: underline;' : ''; ?>">
-                    <?php echo $lang['nav_polls']; ?>
-                </a>
-
-                <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="index.php?page=directory" style="<?php echo ($page === 'directory') ? 'text-decoration: underline;' : ''; ?>">Directory</a>
-
-                    <a href="index.php?page=feed&tab=private" style="<?php echo ($page === 'feed' && $tab === 'private') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_private']; ?></a>
-
-                    <a href="index.php?page=feed&tab=other" style="<?php echo ($page === 'feed' && $tab === 'other') ? 'text-decoration: underline;' : ''; ?>"><?php echo $lang['nav_other']; ?></a>
-
-                    <a href="index.php?page=documents" style="<?php echo ($page === 'documents') ? 'text-decoration: underline;' : ''; ?>">
-                        <?php echo $lang['nav_documents']; ?></a>
+                <?php if ($isLoggedIn): ?>
+                    <a href="index.php?page=feed&tab=private" style="<?= ($page === 'feed' && $tab === 'private') ? 'text-decoration: underline;' : '' ?>"><?= $lang['nav_private'] ?></a>
+                    <a href="index.php?page=feed&tab=other" style="<?= ($page === 'feed' && $tab === 'other') ? 'text-decoration: underline;' : '' ?>"><?= $lang['nav_other'] ?></a>
                 <?php endif; ?>
             </div>
 
             <div class="nav-right">
-                <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="index.php?page=profile" style="<?php echo $page === 'profile' ? 'text-decoration: underline;' : ''; ?>">
-                        <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong>
+                <?php if ($isLoggedIn): ?>
+                    <a href="index.php?page=profile" style="<?= $page === 'profile' ? 'text-decoration: underline;' : '' ?>">
+                        <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>
                     </a>
-
                     <a href="index.php?page=events" class="<?= ($page === 'events') ? 'active' : '' ?>">Events</a>
-
-                    <a href="index.php?page=messages" class="<?= ($page === 'messages') ? 'active' : '' ?>">Messages<?php if ($unreadCount > 0): ?>
-                        <span style="background: var(--danger); color: white; padding: 2px 6px; border-radius: 50%; font-size: 0.7rem; margin-left: 5px;">
-                            <?= $unreadCount ?>
-                        </span>
+                    <a href="index.php?page=messages" class="<?= ($page === 'messages') ? 'active' : '' ?>">
+                        Messages<?php if ($unreadCount > 0): ?>
+                        <span style="background: var(--danger); color: white; padding: 2px 6px; border-radius: 50%; font-size: 0.7rem; margin-left: 5px;"><?= $unreadCount ?></span>
                     <?php endif; ?>
                     </a>
-
-                    <a href="logout.php" style="color: #ff6666;"><?php echo $lang['nav_logout']; ?></a>
-
+                    <a href="logout.php" style="color: #ff6666;"><?= $lang['nav_logout'] ?></a>
                 <?php else: ?>
-                    <a href="index.php?page=login" style="<?php echo $page === 'login' ? 'text-decoration: underline;' : ''; ?>">
-                        <?php echo $lang['nav_login']; ?>
-                    </a>
-                    <a href="index.php?page=register" style="<?php echo $page === 'register' ? 'text-decoration: underline;' : ''; ?>">
-                        <?php echo $lang['nav_register']; ?>
-                    </a>
+                    <a href="index.php?page=login" style="<?= $page === 'login' ? 'text-decoration: underline;' : '' ?>"><?= $lang['nav_login'] ?></a>
+                    <a href="index.php?page=register" style="<?= $page === 'register' ? 'text-decoration: underline;' : '' ?>"><?= $lang['nav_register'] ?></a>
                 <?php endif; ?>
             </div>
         </div>
@@ -123,64 +138,26 @@ function showAccessDenied($title, $reason)
 
     <div class="container">
         <?php
-        switch ($page) {
-            case 'directory':
-                if (!isset($_SESSION['user_id'])) {
-                    showAccessDenied("Directory", "the neighbor list and skills search");
-                } else {
-                    include 'directory.php';
-                }
-                break;
+        // --- Router Logic ---
+        if (!array_key_exists($page, $routes)) {
+            $page = 'feed';
+        }
 
-            case 'events':
-                include 'events.php';
-                break;
+        $requiresAuth = $routes[$page]['auth'];
+        $isProtectedTab = ($page === 'feed' && in_array($tab, ['private', 'other']));
 
-            case 'polls':
-                include 'polls.php';
-                break;
-
-            case 'register':
-                include 'register.php';
-                break;
-
-            case 'documents':
-                if (!isset($_SESSION['user_id'])) {
-                    showAccessDenied("Documents", "building files and records");
-                } else {
-                    include 'documents.php';
-                }
-                break;
-
-            case 'login':
-                include 'login.php';
-                break;
-
-            case 'profile':
-                if (!isset($_SESSION['user_id'])) {
-                    showAccessDenied("Profile", "your personal settings");
-                } else {
-                    include 'profile.php';
-                }
-                break;
-
-            case 'messages':
-                if (!isset($_SESSION['user_id'])) {
-                    showAccessDenied("Messages", "your conversations");
-                } else {
-                    include 'messages.php';
-                }
-                break;
-
-            case 'feed':
-            default:
-                $protectedTabs = ['private', 'other'];
-                if (in_array($tab, $protectedTabs) && !isset($_SESSION['user_id'])) {
-                    showAccessDenied(ucfirst($tab), "resident-only discussions");
-                } else {
-                    include 'feed.php';
-                }
-                break;
+        if (($requiresAuth || $isProtectedTab) && !$isLoggedIn) {
+            $lookup = $isProtectedTab ? $tab : $page;
+            $meta = $pageMeta[$lookup] ?? ['title' => 'Page', 'reason' => 'registered members only'];
+            showAccessDenied($meta['title'], $meta['reason']);
+        } else {
+            // Securely include the file
+            $filePath = __DIR__ . "/{$page}.php";
+            if (file_exists($filePath)) {
+                include $filePath;
+            } else {
+                echo "<h2>Page not found.</h2>";
+            }
         }
         ?>
     </div>
@@ -188,38 +165,26 @@ function showAccessDenied($title, $reason)
     <script>
         const postArea = document.getElementById('postContent');
         const charCount = document.getElementById('charCount');
-
         if (postArea) {
             postArea.addEventListener('input', function() {
                 const length = this.value.length;
                 charCount.textContent = length;
-
-                if (length >= 450) {
-                    charCount.style.color = '#dc3545';
-                } else {
-                    charCount.style.color = '#888';
-                }
+                charCount.style.color = length >= 450 ? '#dc3545' : '#888';
             });
         }
     </script>
 
     <footer style="text-align: center; margin-top: 40px; padding: 20px; color: #888; font-size: 0.85rem;">
         <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
-        <p>&copy; <?php echo date('Y'); ?> Hello Neighbor - <em>Unofficial Learning Web App</em></p>
-        <div style="display: inline-block; margin-right: 20px;">
-            <a href="mailto:filip@filip-peev.com" style="color: #007bff; text-decoration: none; font-weight: bold;">Feedback</a>
-        </div>
+        <p>&copy; <?= date('Y') ?> Hello Neighbor - <em>Unofficial Learning Web App</em></p>
+        <a href="mailto:filip@filip-peev.com" style="color: #007bff; text-decoration: none; font-weight: bold;">Feedback</a>
 
-        <?php
-        // Flag to control the visibility of the language switcher
-        $fully_implemented_yet = false;
-        if ($fully_implemented_yet): ?>
-            <div class="lang-switcher" style="display: inline-block; font-weight: bold;">
-                <a href="?lang=en" style="color: <?php echo $lang_code === 'en' ? 'var(--primary)' : '#aaa'; ?>;">EN</a> |
-                <a href="?lang=bg" style="color: <?php echo $lang_code === 'bg' ? 'var(--primary)' : '#aaa'; ?>;">BG</a>
+        <?php if (isset($fully_implemented_yet) && $fully_implemented_yet): ?>
+            <div class="lang-switcher" style="display: inline-block; font-weight: bold; margin-left: 15px;">
+                <a href="?lang=en" style="color: <?= $lang_code === 'en' ? 'var(--primary)' : '#aaa' ?>;">EN</a> |
+                <a href="?lang=bg" style="color: <?= $lang_code === 'bg' ? 'var(--primary)' : '#aaa' ?>;">BG</a>
             </div>
         <?php endif; ?>
-
     </footer>
 
 </body>
