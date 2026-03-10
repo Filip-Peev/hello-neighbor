@@ -65,6 +65,7 @@ $pageMeta = [
     'directory' => ['title' => 'Directory', 'reason' => 'the neighbor list and skills search'],
     'documents' => ['title' => 'Documents', 'reason' => 'building files and records'],
     'profile'   => ['title' => 'Profile',   'reason' => 'your personal settings'],
+    'events'   => ['title' => 'Events',   'reason' => 'events that are scheduled'],
     'messages'  => ['title' => 'Messages',  'reason' => 'your conversations'],
     'private'   => ['title' => 'Private',   'reason' => 'resident-only discussions'],
     'other'     => ['title' => 'Other',     'reason' => 'resident-only discussions'],
