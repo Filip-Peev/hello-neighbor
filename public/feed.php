@@ -27,6 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Unauthorized: You must be logged in to post or edit.");
     }
 
+    // --- ADD THIS CHECK HERE ---
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Security token mismatch. Please refresh the page and try again.");
+    }
+    // ---------------------------
+
     $returnPage = isset($_POST['return_page']) ? (int)$_POST['return_page'] : 1;
     $dateQuery = $selectedDate ? "&date=" . urlencode($selectedDate) : "";
 
@@ -149,6 +155,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
     <?php if ($userId): ?>
         <?php if ($selectedDate === date('Y-m-d')): ?>
             <form method="POST" action="index.php?page=feed&tab=<?php echo htmlspecialchars($currentTab); ?>&date=<?php echo urlencode($selectedDate); ?>">
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                 <label><strong>Post to <?php echo htmlspecialchars($displayTitle); ?>:</strong></label><br>
                 <textarea name="post_content" id="postContent" maxlength="500" minlength="2" placeholder="Share something with the community..." required
                     style="width: 100%; height: 80px; padding: 10px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; font-family: sans-serif; resize: vertical;"></textarea><br>
@@ -265,6 +272,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
                             <button onclick="toggleEdit(<?php echo $post['id']; ?>)" class="edit-button">Edit</button>
 
                             <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?><?php echo $selectedDate ? '&date=' . urlencode($selectedDate) : ''; ?>" onsubmit="return confirm('Delete this post?');">
+                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                                 <input type="hidden" name="delete_post_id" value="<?php echo $post['id']; ?>">
                                 <input type="hidden" name="return_page" value="<?php echo $pageNumber; ?>">
                                 <button type="submit" class="delete-button">Delete</button>
@@ -290,6 +298,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 
                                 <?php if ($userId && ($comment['user_id'] == $userId || $userRole === 'admin')): ?>
                                     <form method="POST" action="delete_comment.php" onsubmit="return confirm('Delete this comment?');" style="position: absolute; right: 0; top: 0;">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                                         <input type="hidden" name="comment_id" value="<?php echo $comment['id']; ?>">
                                         <input type="hidden" name="return_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
                                         <button type="submit" class="btn-remove-comment"><?php echo $lang['btn_remove']; ?></button>
@@ -300,6 +309,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 
                         <?php if ($userId): ?>
                             <form method="POST" action="add_comment.php" style="margin-top: 10px;">
+                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                                 <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
                                 <input type="hidden" name="return_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
                                 <input type="text" name="comment_content" maxlength="500" placeholder="Add a comment..." required style="width: 80%; padding: 5px; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
@@ -311,7 +321,7 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 
                 <div id="edit-mode-<?php echo $post['id']; ?>" style="display: none;">
                     <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?><?php echo $selectedDate ? '&date=' . urlencode($selectedDate) : ''; ?>">
-                        <input type="hidden" name="update_post_id" value="<?php echo $post['id']; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>"><input type="hidden" name="update_post_id" value="<?php echo $post['id']; ?>">
                         <input type="hidden" name="return_page" value="<?php echo $pageNumber; ?>">
                         <textarea name="edit_content" maxlength="500" minlength="2" style="width: 100%; height: 70px; padding: 8px; margin-bottom: 8px; border: 1px solid #ccc; font-family: sans-serif;"><?php echo htmlspecialchars($post['content']); ?></textarea><br>
                         <button type="submit" style="background: #28a745; color: white; padding: 5px 12px; font-size: 0.75rem; border: none; border-radius: 4px; cursor: pointer;">Save</button>

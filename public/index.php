@@ -1,6 +1,9 @@
 <?php
 ob_start();
 session_start();
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 // --- Configuration & Language ---
 $supported_langs = ['en', 'bg'];
