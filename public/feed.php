@@ -321,7 +321,8 @@ $displayTitle = $titles[$currentTab] ?? 'Notice Board';
 
                 <div id="edit-mode-<?php echo $post['id']; ?>" style="display: none;">
                     <form method="POST" action="index.php?page=feed&tab=<?php echo $currentTab; ?>&p=<?php echo $pageNumber; ?><?php echo $selectedDate ? '&date=' . urlencode($selectedDate) : ''; ?>">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>"><input type="hidden" name="update_post_id" value="<?php echo $post['id']; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                        <input type="hidden" name="update_post_id" value="<?php echo $post['id']; ?>">
                         <input type="hidden" name="return_page" value="<?php echo $pageNumber; ?>">
                         <textarea name="edit_content" maxlength="500" minlength="2" style="width: 100%; height: 70px; padding: 8px; margin-bottom: 8px; border: 1px solid #ccc; font-family: sans-serif;"><?php echo htmlspecialchars($post['content']); ?></textarea><br>
                         <button type="submit" style="background: #28a745; color: white; padding: 5px 12px; font-size: 0.75rem; border: none; border-radius: 4px; cursor: pointer;">Save</button>
