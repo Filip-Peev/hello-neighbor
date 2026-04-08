@@ -108,7 +108,7 @@ function showAccessDenied($title, $reason)
                 <?php foreach (['feed', 'polls', 'directory', 'documents'] as $key): ?>
                     <?php if (!$routes[$key]['auth'] || $isLoggedIn): ?>
                         <a href="index.php?page=<?= $key ?><?= ($key === 'feed') ? '&tab=public' : '' ?>"
-                            style="<?= ($page === $key) ? 'text-decoration: underline;' : '' ?>">
+                            style="<?= ($page === $key && ($key !== 'feed' || $tab === 'public')) ? 'text-decoration: underline;' : '' ?>">
                             <?= $routes[$key]['label'] ?>
                         </a>
                     <?php endif; ?>
