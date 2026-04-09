@@ -874,7 +874,6 @@ button:active {
   .nav-right a {
     width: auto;
     white-space: nowrap;
-    font-size: 0.9rem;
   }
 }
 @media (max-width: 600px) {
